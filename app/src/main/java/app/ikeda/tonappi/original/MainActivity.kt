@@ -26,5 +26,18 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("キャンセル", null)
             .show() }
 
+        //ケース登録ボタンを押したとき
+        binding.caseAddButton.setOnClickListener {
+            MaterialAlertDialogBuilder(this)
+                .setTitle("ケースの種類")
+                .setSingleChoiceItems(arrayOf("ソフト用(2ヶ月)", "ハード用(6ヶ月)"), 0) { dialog, which ->
+
+                }
+                .setPositiveButton("はい") {dialog, which ->
+
+                }
+                .setNegativeButton("キャンセル", null)
+                .show() }
+
     }
 }
