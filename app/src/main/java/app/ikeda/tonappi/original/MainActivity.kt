@@ -1,11 +1,15 @@
 package app.ikeda.tonappi.original
 
+import android.app.DatePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.DatePicker
 import app.ikeda.tonappi.original.databinding.ActivityMainBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class MainActivity : AppCompatActivity() {
+//DataPickerDialog.OnDateSetListenerを追加
+class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -39,5 +43,21 @@ class MainActivity : AppCompatActivity() {
                 .setNegativeButton("キャンセル", null)
                 .show() }
 
+
+
     }
+    //DatePickerDialogを呼び出すメソッド
+
+    override fun onDateSet(view: DatePicker, year: Int, monthOfYear: Int, dayOfMonth: Int) {
+        val lensStartDate: String = getString(R.string.lensstringformat, year, monthOfYear+1, dayOfMonth)
+        binding.lensPeriodView.text = "$lensStartDate~"
+
+    }
+
+    fun showDatePickerDialog(v: View) {
+        val newFragment = DatePicker()
+        newFragment.show(supportFragmentManager, "datePicker")
+    }
+
+
 }
