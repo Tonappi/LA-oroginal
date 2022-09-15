@@ -14,7 +14,6 @@
         android:text="レンズ交換まであと"
         app:layout_constraintBottom_toTopOf="@+id/lens_dayleft_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.529"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -33,12 +32,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:onClick="showDatePickerDialog"
         android:text="yyyy/mm/dd"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/lens_add_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="TouchTargetSizeCheck" />
 
@@ -46,11 +43,25 @@
         android:id="@+id/lens_add_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="40dp"
         android:layout_marginBottom="96dp"
         android:text="レンズ登録"
         app:layout_constraintBottom_toTopOf="@+id/case_text_view"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/lens_day_button"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/lens_day_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="96dp"
+        android:text="開始日登録"
+        app:layout_constraintBottom_toTopOf="@id/case_text_view"
+        app:layout_constraintStart_toEndOf="@id/lens_add_button"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/case_text_view"
@@ -60,7 +71,6 @@
         android:text="ケース交換まであと"
         app:layout_constraintBottom_toTopOf="@+id/case_daysleft_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -72,7 +82,6 @@
         android:textSize="40sp"
         app:layout_constraintBottom_toTopOf="@+id/case_period_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -80,12 +89,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:onClick="showDatePickerDialog"
         android:text="yyyy/mm/dd"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/case_add_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="TouchTargetSizeCheck" />
 
@@ -93,9 +100,23 @@
         android:id="@+id/case_add_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="39dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="40dp"
         android:text="ケース登録"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/case_day_button"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/case_day_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginBottom="40dp"
+        android:text="開始日登録"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/case_add_button" />
 </androidx.constraintlayout.widget.ConstraintLayout>
