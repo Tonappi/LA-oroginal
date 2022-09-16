@@ -1,6 +1,8 @@
 package app.ikeda.tonappi.original
 
 import android.app.DatePickerDialog
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -18,6 +20,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     private lateinit var binding: ActivityMainBinding
 
+    //SharedPreferences の変数を宣言
+    private lateinit var prefLens: SharedPreferences
+    private lateinit var prefCase: SharedPreferences
+
     //クリックされたボタンの id を保持できる変数を追加
     @IdRes
     private var clickedButtonId: Int = 0
@@ -27,6 +33,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(this.root) }
 
+        //SharedPreferences を初期化
+        prefLens = getSharedPreferences("レンズの種類保存", Context.MODE_PRIVATE)
+
         //レンズ登録ボタンを押したとき
         var lensperiod: Int = 0
         binding.lensAddButton.setOnClickListener {
@@ -34,17 +43,13 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("レンズの種類")
                 .setSingleChoiceItems(lensList, 0) { dialog, which ->
-                    //選択されたラジオボタンによって、変数lensPeriodの値を変える
+                    //選択されたラジオボタンの
                     var kindOfLens: Int = which
                     Log.d("レンズの種類",kindOfLens.toString())
-                    when (kindOfLens){
-                        0 -> {
-                            lensperiod = 13
-                        }
-                        1 -> {
-                            lensperiod = 30
-                        }
-                    }
+                    //レンズの種類を保存する
+                    val editor = prefLens.edit()
+                    editor.putInt("LENS_TYPE", kindOfLens)
+                    editor.apply()
                 }
                 .setPositiveButton("はい") { dialog, which ->
 
@@ -60,7 +65,13 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("ケースの種類")
                 .setSingleChoiceItems(caseList, 0) { dialog, which ->
-                    //選択されたラジオボタンによって、変数casePeriodの値を変える
+                    //選択されたラジオボタンの
+                    var kindOfCase: Int = which
+                    Log.d("ケースの種類",kindOfCase.toString())
+                    //レンズの種類を保存する
+                    val editor = prefCase.edit()
+                    editor.putInt("CASE_TYPE", kindOfCase)
+                    editor.apply()
 
                 }
                 .setPositiveButton("はい") { dialog, which ->
@@ -109,7 +120,6 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
         //レンズの日付登録ボタンクリック時
         binding.lensDayButton.setOnClickListener {
-            showDatePickerDialog()
             //id を更新
             clickedButtonId = it.id
             showDatePickerDialog()
@@ -120,12 +130,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
         //ケースの日付登録ボタンクリック時
         binding.caseDayButton.setOnClickListener {
-            showDatePickerDialog()
             //id を更新
             clickedButtonId = it.id
             showDatePickerDialog()
             Log.d("開始日", "ケース")
-
 
         }
 
@@ -143,14 +151,13 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 binding.lensPeriodView.text = StartDate.toString()
                 // 保存も書く
             }
+            
             R.id.case_day_button -> {
                 binding.casePeriodView.text = StartDate.toString()
                 // 保存も書く
             }
             else -> {}
         }
-
-
 
     }
 
