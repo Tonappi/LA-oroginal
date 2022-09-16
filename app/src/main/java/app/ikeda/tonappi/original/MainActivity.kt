@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.DatePicker
 import android.widget.TextView
+import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import app.ikeda.tonappi.original.databinding.ActivityMainBinding
@@ -17,12 +18,17 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     private lateinit var binding: ActivityMainBinding
 
+    //クリックされたボタンの id を保持できる変数を追加
+    @IdRes
+    private var clickedButtonId: Int = 0
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(this.root) }
 
         //レンズ登録ボタンを押したとき
+        var lensperiod: Int = 0
         binding.lensAddButton.setOnClickListener {
             val lensList = arrayOf("ソフト(2週間)", "ハード(1ヶ月)")
             MaterialAlertDialogBuilder(this)
@@ -33,10 +39,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     Log.d("レンズの種類",kindOfLens.toString())
                     when (kindOfLens){
                         0 -> {
-
+                            lensperiod = 13
                         }
                         1 -> {
-
+                            lensperiod = 30
                         }
                     }
                 }
@@ -66,28 +72,28 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
 
         //レンズ交換日を取得
-        val lensEndyear = 2022
-        var lensEndmonth = 9
-        val lensEnddate = 17
+        val lensEndyear: Int = 2022
+        var lensEndmonth: Int = 9
+        val lensEnddate: Int = 17
 
         /*/ケース交換日を取得
         val caseEndyear =
         val caseEndmonth =
         val caseEnddate =*/
 
-        //現在の日時を取得
-        val rightNow = Calendar.getInstance()
-        Log.d("現在の日時", rightNow.toString())
+        //目標日の取得
+        val Goaldate = Calendar.getInstance()
+        Log.d("現在の日時", Goaldate.toString())
         lensEndmonth = lensEndmonth - 1
-        rightNow.set(lensEndyear, lensEndmonth, lensEnddate);
+        Goaldate.set(lensEndyear, lensEndmonth, lensEnddate);
         // 1970/1/1 から設定した rightNow のミリ秒
-        val timeMillis1: Long = rightNow.getTimeInMillis()
+        val GoaltimeMillis: Long = Goaldate.getTimeInMillis()
         // 現在時刻のミリ秒
         val currentTimeMillis = System.currentTimeMillis()
 
         //レンズ交換までの日数を計算
         // 差分のミリ秒
-        var different = timeMillis1 - currentTimeMillis
+        var different = GoaltimeMillis - currentTimeMillis
         // ミリ秒から秒へ変換
         different = different / 1000
         // minutes
@@ -104,24 +110,47 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         //レンズの日付登録ボタンクリック時
         binding.lensDayButton.setOnClickListener {
             showDatePickerDialog()
-            //binding.lensPeriodView.text = "$StartDate~"
-            //val LensStartDate =
+            //id を更新
+            clickedButtonId = it.id
+            showDatePickerDialog()
+            Log.d("開始日", "レンズ")
+
+
         }
 
         //ケースの日付登録ボタンクリック時
         binding.caseDayButton.setOnClickListener {
             showDatePickerDialog()
-            //binding.casePeriodView.text = "$StartDate~"
-            //val CaseStartDate =
+            //id を更新
+            clickedButtonId = it.id
+            showDatePickerDialog()
+            Log.d("開始日", "ケース")
+
+
         }
 
     }
 
     //DatePickerDialogを呼び出すメソッド
-    override fun onDateSet(view: DatePicker, year: Int, monthOfYear: Int, dayOfMonth: Int) {
+    override fun onDateSet(view: DatePicker, year: Int, monthOfYear: Int, dayOfMonth: Int){
         //使用開始日を文字列で取得
-        val StartDate: String =getString(R.string.stringformat, year, monthOfYear + 1, dayOfMonth)
+        val StartDate: String = getString(R.string.stringformat, year, monthOfYear + 1, dayOfMonth)
         Log.d("開始日",StartDate.toString())
+
+        //保持された id で処理を分岐
+        when(clickedButtonId) {
+            R.id.lens_day_button -> {
+                binding.lensPeriodView.text = StartDate.toString()
+                // 保存も書く
+            }
+            R.id.case_day_button -> {
+                binding.casePeriodView.text = StartDate.toString()
+                // 保存も書く
+            }
+            else -> {}
+        }
+
+
 
     }
 
