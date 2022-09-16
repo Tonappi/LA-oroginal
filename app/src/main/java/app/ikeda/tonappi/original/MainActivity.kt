@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     private lateinit var binding: ActivityMainBinding
 
+    // Doggy: クリックされたボタンの id を保持できる変数を追加
     @IdRes
     private var clickedButtonId: Int = 0
 
@@ -105,6 +106,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
         // レンズの日付登録ボタンクリック時
         binding.lensDayButton.setOnClickListener {
+            // Doggy: id を更新
             clickedButtonId = it.id
             showDatePickerDialog()
             Log.d("開始日", "レンズ")
@@ -114,6 +116,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
         // ケースの日付登録ボタンクリック時
         binding.caseDayButton.setOnClickListener {
+            // Doggy: id を更新
             clickedButtonId = it.id
             showDatePickerDialog()
             Log.d("開始日", "ケース")
@@ -128,6 +131,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         // 使用開始日を文字列で取得
         val StartDate: String = getString(R.string.stringformat, year, monthOfYear + 1, dayOfMonth)
 
+        // Doggy: 保持された id で処理を分岐
         when(clickedButtonId) {
             R.id.lens_day_button -> {
                 binding.lensPeriodView.text = StartDate
