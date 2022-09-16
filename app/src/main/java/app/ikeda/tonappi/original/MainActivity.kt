@@ -3,6 +3,7 @@ package app.ikeda.tonappi.original
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.SharedPreferences
+import android.icu.text.CaseMap
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -21,8 +22,8 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
     private lateinit var binding: ActivityMainBinding
 
     //SharedPreferences の変数を宣言
-    private lateinit var prefLens: SharedPreferences
-    private lateinit var prefCase: SharedPreferences
+    private lateinit var prefType: SharedPreferences
+    private lateinit var prefDayStr: SharedPreferences
 
     //クリックされたボタンの id を保持できる変数を追加
     @IdRes
@@ -34,10 +35,20 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(this.root) }
 
         //SharedPreferences を初期化
-        prefLens = getSharedPreferences("レンズの種類保存", Context.MODE_PRIVATE)
+        prefType = getSharedPreferences("種類保存", Context.MODE_PRIVATE)
+        prefDayStr = getSharedPreferences("日付str",Context.MODE_PRIVATE)
+
+
+        //レンズの使用開始日を表示
+        val lensStartday = prefDayStr.getString("LENS_DAY_STRING", "開始日登録をしてください")
+        binding.lensPeriodView.text = lensStartday
+
+        //ケースの使用開始日を表示
+        val caseStartday = prefDayStr.getString("CASE_DAY_STRING", "開始日登録をしてください")
+        binding.casePeriodView.text = caseStartday
+
 
         //レンズ登録ボタンを押したとき
-        var lensperiod: Int = 0
         binding.lensAddButton.setOnClickListener {
             val lensList = arrayOf("ソフト(2週間)", "ハード(1ヶ月)")
             MaterialAlertDialogBuilder(this)
@@ -45,9 +56,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 .setSingleChoiceItems(lensList, 0) { dialog, which ->
                     //選択されたラジオボタンの
                     var kindOfLens: Int = which
-                    Log.d("レンズの種類",kindOfLens.toString())
+                    Log.d("レンズの種類選択時",kindOfLens.toString())
                     //レンズの種類を保存する
-                    val editor = prefLens.edit()
+                    val editor = prefType.edit()
                     editor.putInt("LENS_TYPE", kindOfLens)
                     editor.apply()
                 }
@@ -69,7 +80,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     var kindOfCase: Int = which
                     Log.d("ケースの種類",kindOfCase.toString())
                     //レンズの種類を保存する
-                    val editor = prefCase.edit()
+                    val editor = prefType.edit()
                     editor.putInt("CASE_TYPE", kindOfCase)
                     editor.apply()
 
@@ -80,6 +91,30 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 .setNegativeButton("キャンセル", null)
                 .show()
         }
+
+        //レンズの種類を読み取って、日付の計算をする
+        val LensType = prefType.getInt("LENS_TYPE", -1)
+        Log.d("レンズの種類呼び出し",LensType.toString())
+        when(LensType) {
+            0 -> {
+                // あと何日
+            }
+            1 -> {
+                // あと何日
+            }
+        }
+
+        //レンズの種類を読み取って、日付の計算をする
+        val CaseType = prefType.getInt("CASE_TYPE", -1)
+        Log.d("ケースの種類呼び出し",CaseType.toString())
+            when(CaseType) {
+                0 -> {
+                        // あと何日
+                }
+                1 -> {
+                        // あと何日
+                }
+            }
 
 
         //レンズ交換日を取得
@@ -125,7 +160,6 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
             showDatePickerDialog()
             Log.d("開始日", "レンズ")
 
-
         }
 
         //ケースの日付登録ボタンクリック時
@@ -134,7 +168,6 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
             clickedButtonId = it.id
             showDatePickerDialog()
             Log.d("開始日", "ケース")
-
         }
 
     }
@@ -149,12 +182,19 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         when(clickedButtonId) {
             R.id.lens_day_button -> {
                 binding.lensPeriodView.text = StartDate.toString()
-                // 保存も書く
+                //レンズ開始日を文字列で保存
+                val editor = prefDayStr.edit()
+                editor.putString("LENS_DAY_STRING", StartDate)
+                editor.apply()
+
             }
-            
+
             R.id.case_day_button -> {
                 binding.casePeriodView.text = StartDate.toString()
-                // 保存も書く
+                //ケース開始日を文字列で保存
+                val editor = prefDayStr.edit()
+                editor.putString("CASE_DAY_STRING", StartDate)
+                editor.apply()
             }
             else -> {}
         }
