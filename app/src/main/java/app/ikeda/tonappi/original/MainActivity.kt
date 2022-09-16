@@ -5,7 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.DatePicker
-import android.widget.TextView
+import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import app.ikeda.tonappi.original.databinding.ActivityMainBinding
@@ -16,6 +16,9 @@ import java.util.*
 class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     private lateinit var binding: ActivityMainBinding
+
+    @IdRes
+    private var clickedButtonId: Int = 0
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,8 +57,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("ケースの種類")
                 .setSingleChoiceItems(caseList, 0) { dialog, which ->
-                    //選択されたラジオボタンによって、変数casePeriodの値を変える
-
+                    // 選択されたラジオボタンによって、変数casePeriodの値を変える
                 }
                 .setPositiveButton("はい") { dialog, which ->
 
@@ -101,28 +103,43 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         //ケース交換までの日数を計算
         binding.lensDayleftView.text = lensCountdown
 
-        //レンズの日付登録ボタンクリック時
+        // レンズの日付登録ボタンクリック時
         binding.lensDayButton.setOnClickListener {
+            clickedButtonId = it.id
             showDatePickerDialog()
-            //binding.lensPeriodView.text = "$StartDate~"
-            //val LensStartDate =
+            Log.d("開始日", "レンズ")
+            // binding.lensPeriodView.text = "$StartDate~"
+            // val LensStartDate =
         }
 
-        //ケースの日付登録ボタンクリック時
+        // ケースの日付登録ボタンクリック時
         binding.caseDayButton.setOnClickListener {
+            clickedButtonId = it.id
             showDatePickerDialog()
-            //binding.casePeriodView.text = "$StartDate~"
-            //val CaseStartDate =
+            Log.d("開始日", "ケース")
+            // binding.casePeriodView.text = "$StartDate~"
+            // val CaseStartDate =
         }
 
     }
 
     //DatePickerDialogを呼び出すメソッド
     override fun onDateSet(view: DatePicker, year: Int, monthOfYear: Int, dayOfMonth: Int) {
-        //使用開始日を文字列で取得
-        val StartDate: String =getString(R.string.stringformat, year, monthOfYear + 1, dayOfMonth)
-        Log.d("開始日",StartDate.toString())
+        // 使用開始日を文字列で取得
+        val StartDate: String = getString(R.string.stringformat, year, monthOfYear + 1, dayOfMonth)
 
+        when(clickedButtonId) {
+            R.id.lens_day_button -> {
+                binding.lensPeriodView.text = StartDate
+                // 保存も書く
+            }
+            R.id.case_day_button -> {
+                binding.casePeriodView.text = StartDate
+                // 保存も書く
+            }
+            else -> {}
+        }
+        Log.d("開始日", StartDate.toString())
     }
 
     private fun showDatePickerDialog() {
