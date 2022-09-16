@@ -1,6 +1,8 @@
 package app.ikeda.tonappi.original
 
 import android.app.DatePickerDialog
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +19,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     private lateinit var binding: ActivityMainBinding
 
+    // Doggy: SharedPreferences の変数を宣言
+    private lateinit var pref: SharedPreferences
+
     // Doggy: クリックされたボタンの id を保持できる変数を追加
     @IdRes
     private var clickedButtonId: Int = 0
@@ -25,6 +30,8 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(this.root) }
+        // Doggy: SharedPreferences を初期化
+        pref = getSharedPreferences("何か名前をつける", Context.MODE_PRIVATE)
 
         //レンズ登録ボタンを押したとき
         binding.lensAddButton.setOnClickListener {
@@ -33,16 +40,12 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 .setTitle("レンズの種類")
                 .setSingleChoiceItems(lensList, 0) { dialog, which ->
                     //選択されたラジオボタンによって、変数lensPeriodの値を変える
-                    var kindOfLens: Int = which
+                    val kindOfLens: Int = which
                     Log.d("レンズの種類",kindOfLens.toString())
-                    when (kindOfLens){
-                        0 -> {
-
-                        }
-                        1 -> {
-
-                        }
-                    }
+                    // Doggy: レンズの種類を保存する
+                    val editor = pref.edit()
+                    editor.putInt("LENS_TYPE", kindOfLens)
+                    editor.apply()
                 }
                 .setPositiveButton("はい") { dialog, which ->
 
@@ -72,6 +75,17 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         val lensEndyear = 2022
         var lensEndmonth = 9
         val lensEnddate = 17
+
+        // Doggy: レンズの種類を読み取って、日付の計算をする（計算は複数箇所で共通の処理を実行するので、メソッドに切り出せると GOOD!）
+        val lensType = pref.getInt("LENS_TYPE", -1)
+        when(lensType) {
+            0 -> {
+                // あと何日
+            }
+            1 -> {
+                // あと何日
+            }
+        }
 
         /*/ケース交換日を取得
         val caseEndyear =
