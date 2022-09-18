@@ -1,13 +1,15 @@
 package app.ikeda.tonappi.original
 
+import android.app.AlarmManager
 import android.app.DatePickerDialog
-import android.content.Context
+import android.app.PendingIntent
+import android.content.Intent
 import android.content.SharedPreferences
-import android.hardware.camera2.params.LensShadingMap
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +21,12 @@ import java.util.*
 class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var alarmManager: AlarmManager
+
+    //レンズとケースの登録時、種類を保持できる変数を宣言
+    private var kindOfLens: Int = -1
+    private var kindOfCase: Int = -1
+
 
     //SharedPreferences の変数を宣言
     private lateinit var prefType: SharedPreferences
@@ -41,11 +49,11 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
 
         //レンズの使用開始日を表示
-        val lensStartdate = prefStrDate.getString("LENS_yyyy/mm/dd", "開始日登録をしてください")
+        val lensStartdate = prefStrDate.getString("LENS_yyyy/mm/dd", "開始日")
         binding.lensPeriodView.text = lensStartdate
 
         //ケースの使用開始日を表示
-        val caseStartdate = prefStrDate.getString("CASE_yyyy/mm/dd", "開始日登録をしてください")
+        val caseStartdate = prefStrDate.getString("CASE_yyyy/mm/dd", "開始日")
         binding.casePeriodView.text = caseStartdate
 
         //レンズ使用開始日の取得
@@ -60,9 +68,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         val caseStartYear: Int = prefIntDate.getInt("CASE_START_YEAR",-1)
         var caseStartMonth: Int = prefIntDate.getInt("CASE_START_MONTH",-1)
         val caseStartDay: Int = prefIntDate.getInt("CASE_START_DAY",-1)
-        Log.d("レンズの開始年",caseStartYear.toString())
-        Log.d("レンズの開始月",caseStartMonth.toString())
-        Log.d("レンズの開始日",caseStartdate.toString()) //ここまでOK
+        Log.d("ケースの開始年",caseStartYear.toString())
+        Log.d("ケースの開始月",caseStartMonth.toString())
+        Log.d("ケースの開始日",caseStartdate.toString()) //ここまでOK
 
 
         //レンズ登録ボタンを押したとき
@@ -72,15 +80,14 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 .setTitle("レンズの種類")
                 .setSingleChoiceItems(lensList, 0) { dialog, which ->
                     //選択されたラジオボタンの
-                    var kindOfLens: Int = which
+                     kindOfLens = which
                     Log.d("レンズの種類選択時",kindOfLens.toString())
+                }
+                .setPositiveButton("はい") { dialog, which ->
                     //レンズの種類を保存する
                     val editor = prefType.edit()
                     editor.putInt("LENS_TYPE", kindOfLens)
                     editor.apply()
-                }
-                .setPositiveButton("はい") { dialog, which ->
-
                 }
                 .setNegativeButton("キャンセル", null)
                 .show()
@@ -95,14 +102,12 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     //選択されたラジオボタンの
                     var kindOfCase: Int = which
                     Log.d("ケースの種類",kindOfCase.toString())
+                }
+                .setPositiveButton("はい") { dialog, which ->
                     //レンズの種類を保存する
                     val editor = prefType.edit()
                     editor.putInt("CASE_TYPE", kindOfCase)
                     editor.apply()
-
-                }
-                .setPositiveButton("はい") { dialog, which ->
-
                 }
                 .setNegativeButton("キャンセル", null)
                 .show()
@@ -113,6 +118,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         Log.d("レンズの種類呼び出し",LensType.toString())
         when(LensType) {
             0 -> {
+                //テスト日時作成
+                val testing = Calendar.getInstance()
+                testing.timeInMillis = System.currentTimeMillis()
+                testing.add(Calendar.SECOND,10)
                 //レンズ開始日からレンズ終了日を求める
                 val lensendCalendar = Calendar.getInstance()
                 lensStartMonth = lensStartMonth - 1
@@ -124,6 +133,26 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 Log.d("ソフトレンズカウントダウン",lensCountdown.toString())
                 //カウントダウンを表示
                 binding.lensDayleftView.text = "$lensCountdown 日"
+
+                //通知
+                startAlarm(lensendCalendar)
+                /*/ペンディングインテント開始のメソッド
+                val pendingIntent = PendingIntent.getBroadcast(
+                    this@MainActivity,
+                    //requestCodeの値で、ペンディングイベントを識別する
+                    REQUEST_CODE,
+                    //明示的なブロードキャスト
+                    Intent(this, AlarmBroadcastReceiver::class.java).putExtra(
+                        REQUEST_CODE_KEY, REQUEST_CODE
+                    ),
+                    PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
+                )
+                // AlarmManagerをインスタンス化する。
+                alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, lensendCalendar.timeInMillis, startAlarm())
+                Log.d(ALARM_LOG, "alarmManager.set()")*/
+
+
 
             }
             1 -> {
@@ -138,6 +167,8 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 Log.d("ハードレンズカウントダウン",lensCountdown.toString())
                 //カウントダウンを表示
                 binding.lensDayleftView.text = "$lensCountdown 日"
+                //通知
+                startAlarm(lensendCalendar)
 
             }
         }
@@ -158,6 +189,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     Log.d("ソフト用ケースカウントダウン",caseCountdown.toString())
                     //カウントダウンを表示
                     binding.caseDaysleftView.text = "$caseCountdown 日"
+                    //通知
+                    startAlarm(caseendCalendar)
+
 
                 }
                 1 -> {
@@ -172,6 +206,8 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     Log.d("ハード用ケースカウントダウン",caseCountdown.toString())
                     //カウントダウンを表示
                     binding.caseDaysleftView.text = "$caseCountdown 日"
+                    //通知
+                    startAlarm(caseendCalendar)
 
                 }
             }
@@ -193,6 +229,12 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
             Log.d("開始日", "ケース")
         }
 
+    }
+
+    companion object {
+        const val REQUEST_CODE_KEY = "REQUEST_CODE"
+        const val REQUEST_CODE = 1
+        const val ALARM_LOG = "ALARM_LOG"
     }
 
     //DatePickerDialogを呼び出すメソッド
@@ -242,7 +284,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
     }
 
     //カウントダウンのメソッド
-    //レンズ・ケース使用開始日を取得してカレンダークラスに変換するメソッド
+    /*/レンズ・ケース使用開始日を取得してカレンダークラスに変換するメソッド
     fun lensstartdaytoCalender(StartYear:Int, StartMonth: Int, StartDay: Int): Calendar {
 
         Log.d("開始年",StartYear.toString())
@@ -257,9 +299,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
         return StartCalendar
 
-    }
+    }*/
 
-    //終了日と現在の日時のミリ秒差を日数差に変換する
+    //終了日と現在の日時のミリ秒差を日数差に変換するメソッド
     fun changeMillistoDay(endcalendar:Calendar): Int {
         //終了日をミリ秒に換算する
         val TimeMillis = endcalendar.timeInMillis
@@ -274,7 +316,27 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         return differentDays.toInt()
     }
 
+    //通知を作成するメソッド
+    fun startAlarm(lensendCalendar:Calendar) {
+        //アラームがトリガーされたときに開始するペンディングインテント
+        val pendingIntent = PendingIntent.getBroadcast(
+            this@MainActivity,
+            //requestCodeの値で、ペンディングイベントを識別する
+            REQUEST_CODE,
+            //明示的なブロードキャスト
+            Intent(this, AlarmBroadcastReceiver::class.java).putExtra(
+                REQUEST_CODE_KEY, REQUEST_CODE
+            ),
+            PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
+        )
+        // AlarmManagerをインスタンス化する。
+        alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, lensendCalendar.timeInMillis, pendingIntent)
+        Log.d(ALARM_LOG, "alarmManager.set()")
 
+        Toast.makeText(this, "レンズ交換のアラーム設定が完了しました", Toast.LENGTH_SHORT).show()
+
+    }
 }
 
 
