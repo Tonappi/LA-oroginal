@@ -3,6 +3,7 @@ package app.ikeda.tonappi.original
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.SharedPreferences
+import android.hardware.camera2.params.LensShadingMap
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -34,18 +35,34 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(this.root) }
 
         //SharedPreferences を初期化
-        prefType = getSharedPreferences("種類保存", Context.MODE_PRIVATE)
-        prefStrDate = getSharedPreferences("使用開始日_str",Context.MODE_PRIVATE)
-        prefIntDate = getSharedPreferences("使用開始_int型",Context.MODE_PRIVATE)
+        prefType = getSharedPreferences("種類保存", MODE_PRIVATE)
+        prefStrDate = getSharedPreferences("使用開始日_str", MODE_PRIVATE)
+        prefIntDate = getSharedPreferences("使用開始_int型", MODE_PRIVATE)
 
 
         //レンズの使用開始日を表示
-        val lensStartday = prefStrDate.getString("LENS_yyyy/mm/dd", "開始日登録をしてください")
-        binding.lensPeriodView.text = lensStartday
+        val lensStartdate = prefStrDate.getString("LENS_yyyy/mm/dd", "開始日登録をしてください")
+        binding.lensPeriodView.text = lensStartdate
 
         //ケースの使用開始日を表示
-        val caseStartday = prefStrDate.getString("CASE_yyyy/mm/dd", "開始日登録をしてください")
-        binding.casePeriodView.text = caseStartday
+        val caseStartdate = prefStrDate.getString("CASE_yyyy/mm/dd", "開始日登録をしてください")
+        binding.casePeriodView.text = caseStartdate
+
+        //レンズ使用開始日の取得
+        val lensStartYear: Int = prefIntDate.getInt("LENS_START_YEAR",-1)
+        var lensStartMonth: Int = prefIntDate.getInt("LENS_START_MONTH",-1)
+        val lensStartDay: Int = prefIntDate.getInt("LENS_START_DAY",-1)
+        Log.d("レンズの開始年",lensStartYear.toString())
+        Log.d("レンズの開始月",lensStartMonth.toString())
+        Log.d("レンズの開始日",lensStartDay.toString()) //ここまでOK
+
+        //ケース使用開始日の取得
+        val caseStartYear: Int = prefIntDate.getInt("CASE_START_YEAR",-1)
+        var caseStartMonth: Int = prefIntDate.getInt("CASE_START_MONTH",-1)
+        val caseStartDay: Int = prefIntDate.getInt("CASE_START_DAY",-1)
+        Log.d("レンズの開始年",caseStartYear.toString())
+        Log.d("レンズの開始月",caseStartMonth.toString())
+        Log.d("レンズの開始日",caseStartdate.toString()) //ここまでOK
 
 
         //レンズ登録ボタンを押したとき
@@ -91,81 +108,37 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 .show()
         }
 
-        //ケース使用開始日の取得
-        val caseStartYear = prefIntDate.getInt("CASE_START_YEAR",0)
-        //ケース使用開始日をCalenderクラスで扱えるように変換する
-
         //レンズの種類を読み取って、日付の計算をする
         val LensType = prefType.getInt("LENS_TYPE", -1)
         Log.d("レンズの種類呼び出し",LensType.toString())
         when(LensType) {
             0 -> {
-                //レンズ使用開始日の取得
-                val lensStartYear: Int = prefIntDate.getInt("LENS_START_YEAR",-1)
-                var lensStartMonth: Int = prefIntDate.getInt("LENS_START_MONTH",-1)
-                val lensStartDay: Int = prefIntDate.getInt("LENS_START_DAY",-1)
-                Log.d("レンズの開始年",lensStartYear.toString())
-                Log.d("レンズの開始月",lensStartMonth.toString())
-                Log.d("レンズの開始日",lensStartDay.toString()) //ここまでOK
-
-                //レンズ使用開始日をCalenderクラスで扱えるように変換する
-                val lensStartCalendar = Calendar.getInstance()
+                //レンズ開始日からレンズ終了日を求める
+                val lensendCalendar = Calendar.getInstance()
                 lensStartMonth = lensStartMonth - 1
-                lensStartCalendar.set(lensStartYear, lensStartMonth, lensStartDay)
-                Log.d("ソフトレンズの使用開始日付",lensStartCalendar.toString())
-                //使用開始日に2週間足して、終了日を求める
-                val lensEndDate = lensStartCalendar.add(Calendar.DATE,14)
-                Log.d("ソフトレンズの終了日日付",lensEndDate.toString())
-                // 1970/1/1 から設定した lensEndCalendar のミリ秒
-                val lensTimeMillis: Long = lensEndDate.timeInMillis
-                Log.d("終了日のミリ秒",lensTimeMillis.toString())
-                // 現在時刻のミリ秒
-                val currentTimeMillis = System.currentTimeMillis()
-                Log.d("現在時刻のミリ秒",currentTimeMillis.toString())
-                //レンズ交換までの日数を計算
-                // 差分のミリ秒
-                var different = lensTimeMillis - currentTimeMillis
-                // ミリ秒から秒、分、時間、1日へ変換
-                different = different / (1000*60*60*24)
-
-                //レンズ交換までの日数を表示
-                val lensCountdown: String = "$different 日"
-                Log.d("ソフトレンズカウントダウン",different.toString())
-                binding.lensDayleftView.text = lensCountdown
+                lensendCalendar.set(lensStartYear, lensStartMonth, lensStartDay)
+                lensendCalendar.add(Calendar.DATE,14)
+                Log.d("ソフトレンズの終了日",lensendCalendar.toString())
+                //カウントダウン日数を求めるメソッド呼び出し
+                val lensCountdown: Int= changeMillistoDay(lensendCalendar)
+                Log.d("ソフトレンズカウントダウン",lensCountdown.toString())
+                //カウントダウンを表示
+                binding.lensDayleftView.text = "$lensCountdown 日"
 
             }
             1 -> {
-                //レンズ使用開始日の取得
-                val lensStartYear:Int = prefIntDate.getInt("LENS_START_YEAR",-1)
-                var lensStartMonth:Int = prefIntDate.getInt("LENS_START_MONTH",-1)
-                val lensStartDay: Int = prefIntDate.getInt("LENS_START_DAY",-1)
-                Log.d("レンズの開始年",lensStartYear.toString())
-                Log.d("レンズの開始月",lensStartMonth.toString())
-                Log.d("レンズの開始日",lensStartDay.toString())
-                //レンズ使用開始日をCalenderクラスで扱えるように変換する
-                val lensStartCalendar = Calendar.getInstance()
+                //レンズ使用開始日から終了日を求める
+                val lensendCalendar = Calendar.getInstance()
                 lensStartMonth = lensStartMonth - 1
-                lensStartCalendar.set(lensStartYear, lensStartMonth, lensStartDay)
-                Log.d("ハードレンズの使用開始日付",lensStartCalendar.toString())
-                //使用開始日に1ヶ月足す
-                val lensEndDate =lensStartCalendar.add(Calendar.MONTH,1)
-                Log.d("ハードレンズの終了日日付",lensEndDate.toString())
-                // 1970/1/1 から設定した lensEndCalendar のミリ秒
-                val lensTimeMillis: Long = lensEndDate.timeInMillis
-                Log.d("終了日のミリ秒",lensTimeMillis.toString())
-                // 現在時刻のミリ秒
-                val currentTimeMillis = System.currentTimeMillis()
-                Log.d("現在時刻のミリ秒",currentTimeMillis.toString())
-                //レンズ交換までの日数を計算
-                // 差分のミリ秒
-                var different = lensTimeMillis - currentTimeMillis
-                // ミリ秒から秒、分、時間、1日へ変換
-                different = different / (1000*60*60*24)
+                lensendCalendar.set(lensStartYear, lensStartMonth, lensStartDay)
+                Log.d("ハードレンズの終了日",lensendCalendar.toString())
+                lensendCalendar.add(Calendar.MONTH,1)
+                //カウントダウン日数を求めるメソッド呼び出し
+                val lensCountdown: Int= changeMillistoDay(lensendCalendar)
+                Log.d("ハードレンズカウントダウン",lensCountdown.toString())
+                //カウントダウンを表示
+                binding.lensDayleftView.text = "$lensCountdown 日"
 
-                //レンズ交換までの日数を表示
-                val lensCountdown: String = "$different 日"
-                Log.d("ハードレンズカウントダウン",different.toString())
-                binding.lensDayleftView.text = lensCountdown
             }
         }
 
@@ -174,10 +147,32 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         Log.d("ケースの種類呼び出し",CaseType.toString())
             when(CaseType) {
                 0 -> {
-                    //使用開始日に2ヶ月足す
+                    //ケース使用開始日から終了日を求める(2ヶ月足す)
+                    val caseendCalendar = Calendar.getInstance()
+                    caseStartMonth = caseStartMonth - 1
+                    caseendCalendar.set(caseStartYear, caseStartMonth, caseStartDay)
+                    Log.d("ソフト用ケースの終了日",caseendCalendar.toString())
+                    caseendCalendar.add(Calendar.MONTH,2)
+                    //カウントダウン日数を求めるメソッド呼び出し
+                    val caseCountdown: Int= changeMillistoDay(caseendCalendar)
+                    Log.d("ソフト用ケースカウントダウン",caseCountdown.toString())
+                    //カウントダウンを表示
+                    binding.caseDaysleftView.text = "$caseCountdown 日"
+
                 }
                 1 -> {
-                    //使用開始日に6ヶ月足す
+                    //ケース使用開始日から終了日を求める(6ヶ月足す)
+                    val caseendCalendar = Calendar.getInstance()
+                    caseStartMonth = caseStartMonth - 1
+                    caseendCalendar.set(caseStartYear, caseStartMonth, caseStartDay)
+                    Log.d("ハード用ケースの終了日",caseendCalendar.toString())
+                    caseendCalendar.add(Calendar.MONTH,6)
+                    //カウントダウン日数を求めるメソッド呼び出し
+                    val caseCountdown: Int= changeMillistoDay(caseendCalendar)
+                    Log.d("ハード用ケースカウントダウン",caseCountdown.toString())
+                    //カウントダウンを表示
+                    binding.caseDaysleftView.text = "$caseCountdown 日"
+
                 }
             }
 
@@ -247,7 +242,37 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
     }
 
     //カウントダウンのメソッド
+    //レンズ・ケース使用開始日を取得してカレンダークラスに変換するメソッド
+    fun lensstartdaytoCalender(StartYear:Int, StartMonth: Int, StartDay: Int): Calendar {
+
+        Log.d("開始年",StartYear.toString())
+        Log.d("開始月",StartMonth.toString())
+        Log.d("開始日",StartDay.toString()) //ここまでOK
+
+        //レンズ使用開始日をCalenderクラスで扱えるように変換する
+        val StartCalendar = Calendar.getInstance()
+        var StartMonth = StartMonth - 1
+        StartCalendar.set(StartYear, StartMonth, StartDay)
+        Log.d("レンズの使用開始日付",StartCalendar.toString())
+
+        return StartCalendar
+
+    }
+
     //終了日と現在の日時のミリ秒差を日数差に変換する
+    fun changeMillistoDay(endcalendar:Calendar): Int {
+        //終了日をミリ秒に換算する
+        val TimeMillis = endcalendar.timeInMillis
+        // 現在時刻のミリ秒
+        val currentTimeMillis = System.currentTimeMillis()
+        Log.d("現在時刻のミリ秒",currentTimeMillis.toString())
+        //終了日と現在時刻のミリ秒差
+        val differentMillis = TimeMillis - currentTimeMillis
+        //終了日と現在の日数差
+        val differentDays = differentMillis/(1000*60*60*24)
+        //日数差を戻り値にする
+        return differentDays.toInt()
+    }
 
 
 }
