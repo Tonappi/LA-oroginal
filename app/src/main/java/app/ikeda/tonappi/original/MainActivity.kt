@@ -59,8 +59,8 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
         //カウントダウン日数を計算して、取得
         setDayleftview()
-        val lensPeriod: String? = prefCountDown.getString("LENS_COUNT","NO_DATA")
-        val casePeriod: String? = prefCountDown.getString("CASE_COUNT","NO_DATA")
+        val lensPeriod: String? = prefCountDown.getString("LENS_COUNT","××")
+        val casePeriod: String? = prefCountDown.getString("CASE_COUNT","××")
         //レンズカウントダウンを表示
         binding.lensDayleftView.text = "$lensPeriod 日"
         //ケースカウントダウンを表示
@@ -135,10 +135,11 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         //使用開始日を表示形式(yyyy/mm/dd)で取得
         val StartDate: String = getString(R.string.stringformat, year, monthOfYear + 1, dayOfMonth)
         Log.d("開始日",StartDate.toString())
+        
         //カウントダウン日数を計算して、取得
-        setDayleftview()
-        val lensPeriod: String? = prefCountDown.getString("LENS_COUNT","NO_DATA")
-        val casePeriod: String? = prefCountDown.getString("CASE_COUNT","NO_DATA")
+        setDayleftviewpicker(year,monthOfYear,dayOfMonth,year,monthOfYear,dayOfMonth)
+        val lensPeriod: String? = prefCountDown.getString("LENS_COUNT","NO_DATE")
+        val casePeriod: String? = prefCountDown.getString("CASE_COUNT","NO_DATE")
 
         //保持された id で処理を分岐
         when(clickedButtonId) {
@@ -222,7 +223,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     }
 
-    //残りの日数を計算して保存するメソッド
+    //データが保存されているときカウントダウン日数を計算して保存するメソッド
     //レンズ
     fun setDayleftview() {
         //レンズ使用開始日の取得
@@ -243,7 +244,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
         //レンズの種類を読み取って、日付の計算をする
         val lensType = prefType.getInt("LENS_TYPE", -1)
-        Log.d("レンズの種類呼び出し",lensType.toString())
+        Log.d(ALARM_LOG,lensType.toString())
         when(lensType) {
             0 -> {
                 //レンズ開始日からレンズ終了日を求める
@@ -285,7 +286,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
         //ケースの種類を読み取って、日付の計算をする
         val caseType = prefType.getInt("CASE_TYPE", -1)
-        Log.d("ケースの種類呼び出し",caseType.toString())
+        Log.d(ALARM_LOG,caseType.toString())
         when(caseType) {
             0 -> {
                 //ケース使用開始日から終了日を求める(2ヶ月足す)
@@ -309,6 +310,93 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 //ケース使用開始日から終了日を求める(6ヶ月足す)
                 val caseendCalendar = Calendar.getInstance()
                 caseStartMonth = caseStartMonth - 1
+                caseendCalendar.set(caseStartYear, caseStartMonth, caseStartDay)
+                Log.d("ハード用ケースの終了日",caseendCalendar.toString())
+                caseendCalendar.add(Calendar.MONTH,6)
+                //カウントダウン日数を求めるメソッド呼び出し
+                val caseCountdown: Int= changeMillistoDay(caseendCalendar)
+                Log.d("ハード用ケースカウントダウン",caseCountdown.toString())
+                //カウントダウン日数を保存
+                val editorCount = prefCountDown.edit()
+                editorCount .putString("CASE_COUNT",caseCountdown.toString())
+                editorCount.apply()
+                //通知
+                startAlarm(caseendCalendar)
+            }
+        }
+    }
+
+    //Datepickerで選んだあと、レンズの残り日数を計算
+    fun setDayleftviewpicker(lensStartYear: Int, lensStartMonth: Int, lensStartDay: Int, caseStartYear: Int, caseStartMonth: Int, caseStartDay: Int) {
+
+        //レンズの種類を読み取って、日付の計算をする
+        val lensType = prefType.getInt("LENS_TYPE", -1)
+        Log.d(ALARM_LOG,lensType.toString())
+        when(lensType) {
+            0 -> {
+                //レンズ開始日からレンズ終了日を求める
+                val lensendCalendar = Calendar.getInstance()
+                //lensStartMonth = lensStartMonth - 1
+                lensendCalendar.set(lensStartYear, lensStartMonth, lensStartDay)
+                lensendCalendar.add(Calendar.DATE,14)
+                Log.d("ソフトレンズの終了日",lensendCalendar.toString())
+                //カウントダウン日数を求めるメソッド呼び出し
+                val lensCountdown: Int= changeMillistoDay(lensendCalendar)
+                Log.d("ソフトレンズカウントダウン",lensCountdown.toString())
+                //戻り値にカウントダウン日数を返す
+                val editorCount = prefCountDown.edit()
+                editorCount .putString("LENS_COUNT",lensCountdown.toString())
+                editorCount.apply()
+                //通知
+                startAlarm(lensendCalendar)
+            }
+
+            1 -> {
+                //レンズ使用開始日から終了日を求める
+                val lensendCalendar = Calendar.getInstance()
+                //lensStartMonth = lensStartMonth - 1
+                lensendCalendar.set(lensStartYear, lensStartMonth, lensStartDay)
+                Log.d("ハードレンズの終了日",lensendCalendar.toString())
+                lensendCalendar.add(Calendar.MONTH,1)
+                //カウントダウン日数を求めるメソッド呼び出し
+                val lensCountdown: Int= changeMillistoDay(lensendCalendar)
+                Log.d("ハードレンズカウントダウン",lensCountdown.toString())
+                //カウントダウン日数を保存
+                val editorCount = prefCountDown.edit()
+                editorCount .putString("LENS_COUNT",lensCountdown.toString())
+                editorCount.apply()
+                //通知
+                startAlarm(lensendCalendar)
+            }
+
+        }
+
+        //ケースの種類を読み取って、日付の計算をする
+        val caseType = prefType.getInt("CASE_TYPE", -1)
+        Log.d(ALARM_LOG,caseType.toString())
+        when(caseType) {
+            0 -> {
+                //ケース使用開始日から終了日を求める(2ヶ月足す)
+                val caseendCalendar = Calendar.getInstance()
+                //caseStartMonth = caseStartMonth - 1
+                caseendCalendar.set(caseStartYear, caseStartMonth, caseStartDay)
+                Log.d("ソフト用ケースの終了日",caseendCalendar.toString())
+                caseendCalendar.add(Calendar.MONTH,2)
+                //カウントダウン日数を求めるメソッド呼び出し
+                val caseCountdown: Int= changeMillistoDay(caseendCalendar)
+                Log.d("ソフト用ケースカウントダウン",caseCountdown.toString())
+                //カウントダウン日数を保存
+                val editorCount = prefCountDown.edit()
+                editorCount .putString("CASE_COUNT",caseCountdown.toString())
+                editorCount.apply()
+                //通知
+                startAlarm(caseendCalendar)
+            }
+
+            1 -> {
+                //ケース使用開始日から終了日を求める(6ヶ月足す)
+                val caseendCalendar = Calendar.getInstance()
+                //caseStartMonth = caseStartMonth - 1
                 caseendCalendar.set(caseStartYear, caseStartMonth, caseStartDay)
                 Log.d("ハード用ケースの終了日",caseendCalendar.toString())
                 caseendCalendar.add(Calendar.MONTH,6)
