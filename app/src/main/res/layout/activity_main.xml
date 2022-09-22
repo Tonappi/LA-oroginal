@@ -27,12 +27,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <TextView
         android:id="@+id/lens_period_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:text="yyyy/mm/dd"
+        android:text="開始日を登録してください"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/lens_add_button"
         app:layout_constraintEnd_toEndOf="parent"
@@ -83,6 +88,11 @@
         app:layout_constraintBottom_toTopOf="@+id/case_period_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/casepieChart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <TextView
         android:id="@+id/case_period_view"

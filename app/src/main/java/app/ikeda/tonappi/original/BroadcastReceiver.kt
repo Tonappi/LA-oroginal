@@ -53,7 +53,7 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
                 CHANNEL_ID,
                 context.getString(R.string.channel_name),
                 //通知の優先度
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
                 description = context.getString(R.string.channel_description)
                 // バイブレーションの設定。
