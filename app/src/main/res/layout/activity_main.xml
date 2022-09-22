@@ -6,15 +6,29 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/lens_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
-        android:text="レンズ交換まであと"
-        app:layout_constraintBottom_toTopOf="@+id/lens_dayleft_view"
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/lens_pieChart"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@id/lens_period_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lens_text_view">
+
+    </com.github.mikephil.charting.charts.PieChart>
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/case_pieChart"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/case_text_view"
+        app:layout_constraintBottom_toTopOf="@id/case_period_view"/>
 
     <TextView
         android:id="@+id/lens_dayleft_view"
@@ -27,17 +41,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/pieChart"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+    <TextView
+        android:id="@+id/lens_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:text="レンズ交換まであと"
+        app:layout_constraintBottom_toTopOf="@+id/lens_dayleft_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/lens_period_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:text="開始日を登録してください"
+        android:text="yyyy/mm/dd"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/lens_add_button"
         app:layout_constraintEnd_toEndOf="parent"
@@ -65,8 +84,8 @@
         android:layout_marginBottom="96dp"
         android:text="開始日登録"
         app:layout_constraintBottom_toTopOf="@id/case_text_view"
-        app:layout_constraintStart_toEndOf="@id/lens_add_button"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/lens_add_button" />
 
     <TextView
         android:id="@+id/case_text_view"
@@ -88,11 +107,6 @@
         app:layout_constraintBottom_toTopOf="@+id/case_period_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/casepieChart"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
     <TextView
         android:id="@+id/case_period_view"
@@ -129,4 +143,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/case_add_button" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
