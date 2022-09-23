@@ -5,11 +5,13 @@ import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.DatePicker
 import android.widget.Toast
+import androidx.annotation.ColorRes
 import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -526,7 +528,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
     //レンズの円グラフを表示するメソッド
     fun setLensPieChart(periodOfuse: Float, daysLeft: Float) {
         //表示用サンプルデータの作成
-        val dimensions = listOf<String>("使用期間", "残りの日数")
+        val dimensions = listOf<String>("", "")
         val values = listOf<Float>(periodOfuse-daysLeft, daysLeft)
         //Entryにデータ格納
         var entryList = mutableListOf<PieEntry>()
@@ -539,7 +541,8 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         //PieDataSetにデータ格納
         val pieDataSet = PieDataSet(entryList,"candle")
         //DataSetのフォーマット指定
-        pieDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
+        pieDataSet.colors = listOf(Color.rgb(1,135,134),Color.rgb(167,255,235))
+        pieDataSet.setDrawValues(false)
 
         //PieDataにPieDataSetを格納
         val pieData = PieData(pieDataSet)
@@ -548,6 +551,8 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         pieChart.data = pieData
         //Chartのフォーマット指定
         pieChart.legend.isEnabled = false
+        pieChart.holeRadius = 80f
+        pieChart.description.isEnabled = false
         //PieChart更新
         pieChart.invalidate()
     }
@@ -555,7 +560,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
     //ケースの円グラフを表示するメソッド
     fun setCasePieChart( periodOfuse: Float, daysLeft: Float){
         //表示用サンプルデータの作成
-        val dimensions = listOf<String>("使用期間", "残りの日数")
+        val dimensions = listOf<String>("", "")
         val values = listOf<Float>(periodOfuse-daysLeft, daysLeft)
         //Entryにデータ格納
         var entryList = mutableListOf<PieEntry>()
@@ -568,7 +573,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         //PieDataSetにデータ格納
         val pieDataSet = PieDataSet(entryList,"candle")
         //DataSetのフォーマット指定
-        pieDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
+        pieDataSet.colors = listOf(Color.rgb(1,135,134),Color.rgb(167,255,235))
+        pieDataSet.setDrawValues(false)
+
 
         //PieDataにPieDataSetを格納
         val pieData = PieData(pieDataSet)
@@ -577,6 +584,8 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         pieChart.data = pieData
         //Chartのフォーマット指定
         pieChart.legend.isEnabled = false
+        pieChart.holeRadius = 80f
+        pieChart.description.isEnabled = false
         //PieChart更新
         pieChart.invalidate()
     }
