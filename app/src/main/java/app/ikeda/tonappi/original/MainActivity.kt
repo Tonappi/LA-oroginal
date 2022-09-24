@@ -10,8 +10,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.DatePicker
-import android.widget.Toast
-import androidx.annotation.ColorRes
 import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +18,6 @@ import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.*
 
@@ -112,6 +109,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 }
                 .setNegativeButton("キャンセル", null)
                 .show()
+
         }
 
         //レンズの日付登録ボタンクリック時
@@ -146,8 +144,8 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         
         //カウントダウン日数を計算して、取得
         setDayleftviewpicker(year,monthOfYear,dayOfMonth,year,monthOfYear,dayOfMonth)
-        val lensPeriod: String? = prefCountDown.getString("LENS_COUNT","No_Data")
-        val casePeriod: String? = prefCountDown.getString("CASE_COUNT","No_Data")
+        val lensPeriod: String? = prefCountDown.getString("LENS_COUNT","××")
+        val casePeriod: String? = prefCountDown.getString("CASE_COUNT","××")
 
         //保持された id で処理を分岐
         when(clickedButtonId) {
@@ -226,9 +224,6 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, endCalendar.timeInMillis, pendingIntent)
         Log.d(ALARM_LOG, "alarmManager.set()")
-
-        //Toast.makeText(this, "レンズ交換のアラーム設定が完了しました", Toast.LENGTH_SHORT).show()
-
     }
 
     //データが保存されているときカウントダウン日数を計算して保存する、円グラフ表示、通知を呼び出すメソッド(アプリの起動時)
@@ -267,10 +262,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("LENS_COUNT",lensCountdown.toString())
                 editorCount.apply()
-                //円グラフ作成、表示のメソッド
-                setLensPieChart(periodOfuse = 14f, daysLeft = lensCountdown.toFloat())
                 //通知
                 startAlarm(lensendCalendar)
+                //円グラフ作成、表示のメソッド
+                setLensPieChart(periodOflens = 14f, daysLeftlens = lensCountdown.toFloat())
             }
 
             1 -> {
@@ -287,10 +282,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("LENS_COUNT",lensCountdown.toString())
                 editorCount.apply()
-                //円グラフ作成、表示のメソッド
-                setLensPieChart(periodOfuse = 30f, daysLeft = lensCountdown.toFloat())
                 //通知
                 startAlarm(lensendCalendar)
+                //円グラフ作成、表示のメソッド
+                setLensPieChart(periodOflens = 30f, daysLeftlens = lensCountdown.toFloat())
             }
 
             else ->{
@@ -310,10 +305,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     val editorCount = prefCountDown.edit()
                     editorCount .putString("LENS_COUNT",lensCountdown.toString())
                     editorCount.apply()
-                    //円グラフ作成、表示のメソッド
-                    setLensPieChart(periodOfuse = 14f, daysLeft = lensCountdown.toFloat())
                     //通知
                     startAlarm(lensendCalendar)
+                    //円グラフ作成、表示のメソッド
+                    setLensPieChart(periodOflens = 14f, daysLeftlens = lensCountdown.toFloat())
                 }
 
             }
@@ -338,10 +333,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("CASE_COUNT",caseCountdown.toString())
                 editorCount.apply()
-                //円グラフ作成、表示のメソッド
-                setCasePieChart(periodOfuse = 60f, daysLeft = caseCountdown.toFloat())
                 //通知
                 startAlarm(caseendCalendar)
+                //円グラフ作成、表示のメソッド
+                setCasePieChart(periodOfcase = 60f, daysLeftcase = caseCountdown.toFloat())
             }
 
             1 -> {
@@ -358,10 +353,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("CASE_COUNT",caseCountdown.toString())
                 editorCount.apply()
-                //円グラフ作成、表示のメソッド
-                setCasePieChart(periodOfuse = 180f, daysLeft = caseCountdown.toFloat())
                 //通知
                 startAlarm(caseendCalendar)
+                //円グラフ作成、表示のメソッド
+                setCasePieChart(periodOfcase = 180f, daysLeftcase = caseCountdown.toFloat())
             }
 
             else->{
@@ -381,10 +376,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     val editorCount = prefCountDown.edit()
                     editorCount.putString("CASE_COUNT", caseCountdown.toString())
                     editorCount.apply()
-                    //円グラフ作成、表示のメソッド
-                    setCasePieChart(periodOfuse = 60f, daysLeft = caseCountdown.toFloat())
                     //通知
                     startAlarm(caseendCalendar)
+                    //円グラフ作成、表示のメソッド
+                    setCasePieChart(periodOfcase = 60f, daysLeftcase = caseCountdown.toFloat())
                 }
             }
         }
@@ -411,10 +406,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("LENS_COUNT",lensCountdown.toString())
                 editorCount.apply()
-                //円グラフ作成、表示のメソッド
-                setLensPieChart(periodOfuse = 14f, daysLeft = lensCountdown.toFloat())
                 //通知
                 startAlarm(lensendCalendar)
+                //円グラフ作成、表示のメソッド
+                setLensPieChart(periodOflens = 14f, daysLeftlens = lensCountdown.toFloat())
             }
 
             1 -> {
@@ -431,10 +426,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("LENS_COUNT",lensCountdown.toString())
                 editorCount.apply()
-                //円グラフ作成、表示のメソッド
-                setLensPieChart(periodOfuse = 30f, daysLeft = lensCountdown.toFloat())
                 //通知
                 startAlarm(lensendCalendar)
+                //円グラフ作成、表示のメソッド
+                setLensPieChart(periodOflens = 30f, daysLeftlens = lensCountdown.toFloat())
             }
 
             else->{
@@ -451,10 +446,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("LENS_COUNT",lensCountdown.toString())
                 editorCount.apply()
-                //円グラフ作成、表示のメソッド
-                setLensPieChart(periodOfuse = 14f, daysLeft = lensCountdown.toFloat())
                 //通知
                 startAlarm(lensendCalendar)
+                //円グラフ作成、表示のメソッド
+                setLensPieChart(periodOflens = 14f, daysLeftlens = lensCountdown.toFloat())
             }
 
         }
@@ -462,6 +457,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         //ケースの種類を読み取って、日付の計算をする
         val caseType = prefType.getInt("CASE_TYPE", -1)
         Log.d(ALARM_LOG,caseType.toString())
+
         when(caseType) {
             0 -> {
                 //ケース使用開始日から終了日を求める(2ヶ月足す)
@@ -477,10 +473,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("CASE_COUNT",caseCountdown.toString())
                 editorCount.apply()
-                //円グラフ作成、表示のメソッド
-                setCasePieChart(periodOfuse = 60f, daysLeft = caseCountdown.toFloat())
                 //通知
                 startAlarm(caseendCalendar)
+                //円グラフ作成、表示のメソッド
+                setCasePieChart(periodOfcase = 60f, daysLeftcase = caseCountdown.toFloat())
             }
 
             1 -> {
@@ -497,10 +493,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("CASE_COUNT",caseCountdown.toString())
                 editorCount.apply()
-                //円グラフ作成、表示のメソッド
-                setCasePieChart(periodOfuse = 180f, daysLeft = caseCountdown.toFloat())
                 //通知
                 startAlarm(caseendCalendar)
+                //円グラフ作成、表示のメソッド
+                setCasePieChart(periodOfcase = 180f, daysLeftcase = caseCountdown.toFloat())
             }
 
             else ->{
@@ -517,19 +513,19 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("CASE_COUNT",caseCountdown.toString())
                 editorCount.apply()
-                //円グラフ作成、表示のメソッド
-                setCasePieChart(periodOfuse = 60f, daysLeft = caseCountdown.toFloat())
                 //通知
                 startAlarm(caseendCalendar)
+                //円グラフ作成、表示のメソッド
+                setCasePieChart(periodOfcase = 60f, daysLeftcase = caseCountdown.toFloat())
             }
         }
     }
 
     //レンズの円グラフを表示するメソッド
-    fun setLensPieChart(periodOfuse: Float, daysLeft: Float) {
+    fun setLensPieChart(periodOflens: Float, daysLeftlens: Float) {
         //表示用サンプルデータの作成
         val dimensions = listOf<String>("", "")
-        val values = listOf<Float>(periodOfuse-daysLeft, daysLeft)
+        val values = listOf<Float>(periodOflens-daysLeftlens, daysLeftlens)
         //Entryにデータ格納
         var entryList = mutableListOf<PieEntry>()
         for (i in values.indices) {
@@ -558,10 +554,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
     }
 
     //ケースの円グラフを表示するメソッド
-    fun setCasePieChart( periodOfuse: Float, daysLeft: Float){
+    fun setCasePieChart( periodOfcase: Float, daysLeftcase: Float){
         //表示用サンプルデータの作成
         val dimensions = listOf<String>("", "")
-        val values = listOf<Float>(periodOfuse-daysLeft, daysLeft)
+        val values = listOf<Float>(periodOfcase-daysLeftcase, daysLeftcase)
         //Entryにデータ格納
         var entryList = mutableListOf<PieEntry>()
         for (i in values.indices) {
