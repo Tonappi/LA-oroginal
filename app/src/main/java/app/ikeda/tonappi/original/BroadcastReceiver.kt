@@ -20,26 +20,18 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent?) {
         if (BuildConfig.DEBUG) {
-            Log.d(MainActivity.LENS_ALARM_LOG, "onReceive()")
-        }
-        if (BuildConfig.DEBUG) {
-            Log.d(MainActivity.CASE_ALARM_LOG, "onReceive()")
+            Log.d("ALARM_LOG", "onReceive()")
         }
 
         val requestLensCode = intent?.getIntExtra(MainActivity.LENS_REQUEST_CODE_KEY, 0) as Int
+        if (BuildConfig.DEBUG){
+            Log.d("ALARM_LOG_requestCode",requestLensCode.toString())
+        }
 
-        val requestCaseCode = intent?.getIntExtra(MainActivity.CASE_REQUEST_CODE_KEY, 0) as Int
         //通知のタップアクション(ユーザーが通知をタップしたときにMainActivityを開く)
         val pendingLensIntent = PendingIntent.getActivity(
             context,
             requestLensCode,
-            Intent(context, MainActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val pendingCaseIntent = PendingIntent.getActivity(
-            context,
-            requestCaseCode,
             Intent(context, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
         )
@@ -54,10 +46,10 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
             // 本文テキスト。
             .setContentText(context.getString(R.string.notification_text))
             // 通知の優先度（Android 7.1以下）。
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             // 通知のタップアクションを設定する。
             .setContentIntent(pendingLensIntent)
-            .setContentIntent(pendingCaseIntent)
+            //.setContentIntent(pendingCaseIntent)
             // ユーザーが通知をタップすると、配信された通知が自動的に消去される。
             .setAutoCancel(true)
 

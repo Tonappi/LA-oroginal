@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">ContactDown</string>
+    <string name="app_name">CONTACDOWN</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="stringformat">%d/%02d/%02d</string>
-    <string name="notification_title">コンタクタイマー</string>
+    <string name="notification_title">CONTACDOWN</string>
     <string name="notification_text">今日が交換日です</string>
     <string name="channel_name">チャンネルの名前</string>
     <string name="channel_description">チャンネルの説明</string>

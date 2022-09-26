@@ -136,10 +136,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     companion object {
         const val LENS_REQUEST_CODE_KEY = "LENS_REQUEST_CODE"
-        const val LENS_REQUEST_CODE = 1
+        //const val LENS_REQUEST_CODE = 1
         const val LENS_ALARM_LOG = "LENS_ALARM_LOG"
-        const val CASE_REQUEST_CODE_KEY = "CASE_REQUEST_CODE"
-        const val CASE_REQUEST_CODE = 1
+        //const val CASE_REQUEST_CODE_KEY = "CASE_REQUEST_CODE"
+        //const val CASE_REQUEST_CODE = 1
         const val CASE_ALARM_LOG = "CASE_ALARM_LOG"
     }
 
@@ -222,10 +222,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         val pendingLensIntent = PendingIntent.getBroadcast(
             this@MainActivity,
             //requestCodeの値で、ペンディングイベントを識別する
-            LENS_REQUEST_CODE,
+            1,
             //明示的なブロードキャスト
             Intent(this, AlarmBroadcastReceiver::class.java).putExtra(
-                LENS_REQUEST_CODE_KEY, LENS_REQUEST_CODE
+                LENS_REQUEST_CODE_KEY, 1
             ),
             PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
         )
@@ -245,10 +245,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         val pendingCaseIntent = PendingIntent.getBroadcast(
             this@MainActivity,
             //requestCodeの値で、ペンディングイベントを識別する
-            CASE_REQUEST_CODE,
+            2,
             //明示的なブロードキャスト
             Intent(this, AlarmBroadcastReceiver::class.java).putExtra(
-                CASE_REQUEST_CODE_KEY, CASE_REQUEST_CODE
+                LENS_REQUEST_CODE_KEY, 2
             ),
             PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
         )
