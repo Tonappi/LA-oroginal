@@ -79,7 +79,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 .setSingleChoiceItems(lensList, 0) { dialog, which ->
                     //選択されたラジオボタンの
                      kindOfLens = which
-                    Log.d("レンズの種類選択時",kindOfLens.toString())
+                    if (BuildConfig.DEBUG){
+                        Log.d("レンズの種類選択時",kindOfLens.toString())
+                    }
                 }
                 .setPositiveButton("はい") { dialog, _ ->
                     //レンズの種類を保存する
@@ -99,7 +101,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 .setSingleChoiceItems(caseList, 0) { dialog, which ->
                     //選択されたラジオボタンの
                     kindOfCase = which
-                    Log.d("ケースの種類",kindOfCase.toString())
+                    if (BuildConfig.DEBUG) {
+                        Log.d("ケースの種類", kindOfCase.toString())
+                    }
                 }
                 .setPositiveButton("はい") { dialog, _ ->
                     //レンズの種類を保存する
@@ -131,16 +135,21 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
     }
 
     companion object {
-        const val REQUEST_CODE_KEY = "REQUEST_CODE"
-        const val REQUEST_CODE = 1
-        const val ALARM_LOG = "ALARM_LOG"
+        const val LENS_REQUEST_CODE_KEY = "LENS_REQUEST_CODE"
+        const val LENS_REQUEST_CODE = 1
+        const val LENS_ALARM_LOG = "LENS_ALARM_LOG"
+        const val CASE_REQUEST_CODE_KEY = "CASE_REQUEST_CODE"
+        const val CASE_REQUEST_CODE = 1
+        const val CASE_ALARM_LOG = "CASE_ALARM_LOG"
     }
 
     //DatePickerDialogを呼び出すメソッド
     override fun onDateSet(view: DatePicker, year: Int, monthOfYear: Int, dayOfMonth: Int){
         //使用開始日を表示形式(yyyy/mm/dd)で取得
         val StartDate: String = getString(R.string.stringformat, year, monthOfYear + 1, dayOfMonth)
-        Log.d("開始日",StartDate.toString())
+        if (BuildConfig.DEBUG){
+            Log.d("開始日",StartDate.toString())
+        }
         
         //カウントダウン日数を計算して、取得
         setDayleftviewpicker(year,monthOfYear,dayOfMonth,year,monthOfYear,dayOfMonth)
@@ -207,23 +216,50 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         return differentDays.toInt()
     }
 
-    //通知を作成するメソッド
-    fun startAlarm(endCalendar:Calendar) {
+    //レンズ通知を作成するメソッド
+    fun lensstartAlarm(endCalendar:Calendar) {
         //アラームがトリガーされたときに開始するペンディングインテント
-        val pendingIntent = PendingIntent.getBroadcast(
+        val pendingLensIntent = PendingIntent.getBroadcast(
             this@MainActivity,
             //requestCodeの値で、ペンディングイベントを識別する
-            REQUEST_CODE,
+            LENS_REQUEST_CODE,
             //明示的なブロードキャスト
             Intent(this, AlarmBroadcastReceiver::class.java).putExtra(
-                REQUEST_CODE_KEY, REQUEST_CODE
+                LENS_REQUEST_CODE_KEY, LENS_REQUEST_CODE
             ),
             PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
         )
         // AlarmManagerをインスタンス化する。
         alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, endCalendar.timeInMillis, pendingIntent)
-        Log.d(ALARM_LOG, "alarmManager.set()")
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, endCalendar.timeInMillis, pendingLensIntent)
+        if(BuildConfig.DEBUG){
+            Log.d(LENS_ALARM_LOG, "alarmManager.set()")
+            Log.d("LENS_ALARM_LOG_引数", endCalendar.toString())
+        }
+
+    }
+
+    //ケース通知を作成するメソッド
+    fun casestartAlarm(endCalendar:Calendar) {
+        //アラームがトリガーされたときに開始するペンディングインテント
+        val pendingCaseIntent = PendingIntent.getBroadcast(
+            this@MainActivity,
+            //requestCodeの値で、ペンディングイベントを識別する
+            CASE_REQUEST_CODE,
+            //明示的なブロードキャスト
+            Intent(this, AlarmBroadcastReceiver::class.java).putExtra(
+                CASE_REQUEST_CODE_KEY, CASE_REQUEST_CODE
+            ),
+            PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
+        )
+        // AlarmManagerをインスタンス化する。
+        alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, endCalendar.timeInMillis, pendingCaseIntent)
+        if(BuildConfig.DEBUG){
+            Log.d(CASE_ALARM_LOG, "alarmManager.set()")
+            Log.d("CASE_ALARM_LOG_引数", endCalendar.toString())
+        }
+
     }
 
     //データが保存されているときカウントダウン日数を計算して保存する、円グラフ表示、通知を呼び出すメソッド(アプリの起動時)
@@ -232,39 +268,49 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         val lensStartYear: Int = prefIntDate.getInt("LENS_START_YEAR",-1)
         var lensStartMonth: Int = prefIntDate.getInt("LENS_START_MONTH",-1)
         val lensStartDay: Int = prefIntDate.getInt("LENS_START_DAY",-1)
-        Log.d("レンズの開始年",lensStartYear.toString())
-        Log.d("レンズの開始月",lensStartMonth.toString())
-        Log.d("レンズの開始日",lensStartDay.toString())
+        if(BuildConfig.DEBUG) {
+            Log.d("レンズの開始年",lensStartYear.toString())
+            Log.d("レンズの開始月",lensStartMonth.toString())
+            Log.d("レンズの開始日",lensStartDay.toString())
+        }
 
         //ケース使用開始日の取得
         val caseStartYear: Int = prefIntDate.getInt("CASE_START_YEAR",-1)
         var caseStartMonth: Int = prefIntDate.getInt("CASE_START_MONTH",-1)
         val caseStartDay: Int = prefIntDate.getInt("CASE_START_DAY",-1)
-        Log.d("ケースの開始年",caseStartYear.toString())
-        Log.d("ケースの開始月",caseStartMonth.toString())
-        Log.d("ケースの開始日",caseStartDay.toString())
+        if(BuildConfig.DEBUG){
+            Log.d("ケースの開始年",caseStartYear.toString())
+            Log.d("ケースの開始月",caseStartMonth.toString())
+            Log.d("ケースの開始日",caseStartDay.toString())
+        }
 
         //レンズの種類を読み取って、日付の計算をする
         val lensType = prefType.getInt("LENS_TYPE", -1)
-        Log.d(ALARM_LOG,lensType.toString())
+        Log.d(LENS_ALARM_LOG,lensType.toString())
         when(lensType) {
             0 -> {
                 //レンズ開始日からレンズ終了日を求める
                 val lensendCalendar = Calendar.getInstance()
                 lensStartMonth = lensStartMonth - 1
                 lensendCalendar.set(lensStartYear, lensStartMonth, lensStartDay)
+                if (BuildConfig.DEBUG){
+                    Log.d("ソフトレンズの終了日",lensendCalendar.toString())
+                }
                 lensendCalendar.add(Calendar.DATE,14)
-                Log.d("ソフトレンズの終了日",lensendCalendar.toString())
                 //カウントダウン日数を求めるメソッド呼び出し
                 val lensCountdown: Int= changeMillistoDay(lensendCalendar)
-                Log.d("ソフトレンズカウントダウン",lensCountdown.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ソフトレンズカウントダウン",lensCountdown.toString())
+                }
                 //戻り値にカウントダウン日数を返す
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("LENS_COUNT",lensCountdown.toString())
                 editorCount.apply()
                 //通知
-                startAlarm(lensendCalendar)
-                Log.d("ALARM_LOG","AlarmSet(lens)")
+                lensstartAlarm(lensendCalendar)
+                if (BuildConfig.DEBUG){
+                    Log.d("LENS_ALARM_LOG","AlarmSet(lens)")
+                }
                 //円グラフ作成、表示のメソッド
                 setLensPieChart(periodOflens = 14f, daysLeftlens = lensCountdown.toFloat())
             }
@@ -274,18 +320,24 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val lensendCalendar = Calendar.getInstance()
                 lensStartMonth = lensStartMonth - 1
                 lensendCalendar.set(lensStartYear, lensStartMonth, lensStartDay)
-                Log.d("ハードレンズの終了日",lensendCalendar.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ハードレンズの終了日",lensendCalendar.toString())
+                }
                 lensendCalendar.add(Calendar.MONTH,1)
                 //カウントダウン日数を求めるメソッド呼び出し
                 val lensCountdown: Int= changeMillistoDay(lensendCalendar)
-                Log.d("ハードレンズカウントダウン",lensCountdown.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ハードレンズカウントダウン",lensCountdown.toString())
+                }
                 //カウントダウン日数を保存
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("LENS_COUNT",lensCountdown.toString())
                 editorCount.apply()
                 //通知
-                startAlarm(lensendCalendar)
-                Log.d("ALARM_LOG","AlarmSet(lens)")
+                lensstartAlarm(lensendCalendar)
+                if (BuildConfig.DEBUG){
+                    Log.d("LENS_ALARM_LOG","AlarmSet(lens)")
+                }
                 //円グラフ作成、表示のメソッド
                 setLensPieChart(periodOflens = 30f, daysLeftlens = lensCountdown.toFloat())
             }
@@ -298,18 +350,24 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     val lensendCalendar = Calendar.getInstance()
                     lensStartMonth = lensStartMonth - 1
                     lensendCalendar.set(lensStartYear, lensStartMonth, lensStartDay)
+                    if (BuildConfig.DEBUG){
+                        Log.d("ソフトレンズの終了日",lensendCalendar.toString())
+                    }
                     lensendCalendar.add(Calendar.DATE,14)
-                    Log.d("ソフトレンズの終了日",lensendCalendar.toString())
                     //カウントダウン日数を求めるメソッド呼び出し
                     val lensCountdown: Int= changeMillistoDay(lensendCalendar)
-                    Log.d("ソフトレンズカウントダウン",lensCountdown.toString())
+                    if (BuildConfig.DEBUG){
+                        Log.d("ソフトレンズカウントダウン",lensCountdown.toString())
+                    }
                     //戻り値にカウントダウン日数を返す
                     val editorCount = prefCountDown.edit()
                     editorCount .putString("LENS_COUNT",lensCountdown.toString())
                     editorCount.apply()
                     //通知
-                    startAlarm(lensendCalendar)
-                    Log.d("ALARM_LOG","AlarmSet(lens)")
+                    lensstartAlarm(lensendCalendar)
+                    if (BuildConfig.DEBUG){
+                        Log.d("LENS_ALARM_LOG","AlarmSet(lens)")
+                    }
                     //円グラフ作成、表示のメソッド
                     setLensPieChart(periodOflens = 14f, daysLeftlens = lensCountdown.toFloat())
                 }
@@ -320,25 +378,33 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
         //ケースの種類を読み取って、日付の計算をする
         val caseType = prefType.getInt("CASE_TYPE", -1)
-        Log.d(ALARM_LOG,caseType.toString())
+        if (BuildConfig.DEBUG){
+            Log.d(CASE_ALARM_LOG,caseType.toString())
+        }
         when(caseType) {
             0 -> {
                 //ケース使用開始日から終了日を求める(2ヶ月足す)
                 val caseendCalendar = Calendar.getInstance()
                 caseStartMonth = caseStartMonth - 1
                 caseendCalendar.set(caseStartYear, caseStartMonth, caseStartDay)
-                Log.d("ソフト用ケースの終了日",caseendCalendar.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ソフト用ケースの終了日",caseendCalendar.toString())
+                }
                 caseendCalendar.add(Calendar.MONTH,2)
                 //カウントダウン日数を求めるメソッド呼び出し
                 val caseCountdown: Int= changeMillistoDay(caseendCalendar)
-                Log.d("ソフト用ケースカウントダウン",caseCountdown.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ソフト用ケースカウントダウン",caseCountdown.toString())
+                }
                 //カウントダウン日数を保存
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("CASE_COUNT",caseCountdown.toString())
                 editorCount.apply()
                 //通知
-                startAlarm(caseendCalendar)
-                Log.d("ALARM_LOG","AlarmSet(case)")
+                casestartAlarm(caseendCalendar)
+                if (BuildConfig.DEBUG){
+                    Log.d("CASE_ALARM_LOG","AlarmSet(case)")
+                }
                 //円グラフ作成、表示のメソッド
                 setCasePieChart(periodOfcase = 60f, daysLeftcase = caseCountdown.toFloat())
             }
@@ -348,18 +414,24 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val caseendCalendar = Calendar.getInstance()
                 caseStartMonth = caseStartMonth - 1
                 caseendCalendar.set(caseStartYear, caseStartMonth, caseStartDay)
-                Log.d("ハード用ケースの終了日",caseendCalendar.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ハード用ケースの終了日",caseendCalendar.toString())
+                }
                 caseendCalendar.add(Calendar.MONTH,6)
                 //カウントダウン日数を求めるメソッド呼び出し
                 val caseCountdown: Int= changeMillistoDay(caseendCalendar)
-                Log.d("ハード用ケースカウントダウン",caseCountdown.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ハード用ケースカウントダウン",caseCountdown.toString())
+                }
                 //カウントダウン日数を保存
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("CASE_COUNT",caseCountdown.toString())
                 editorCount.apply()
                 //通知
-                startAlarm(caseendCalendar)
-                Log.d("ALARM_LOG","AlarmSet(case)")
+                casestartAlarm(caseendCalendar)
+                if (BuildConfig.DEBUG){
+                    Log.d("CASE_ALARM_LOG","AlarmSet(case)")
+                }
                 //円グラフ作成、表示のメソッド
                 setCasePieChart(periodOfcase = 180f, daysLeftcase = caseCountdown.toFloat())
             }
@@ -372,18 +444,24 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     val caseendCalendar = Calendar.getInstance()
                     caseStartMonth = caseStartMonth - 1
                     caseendCalendar.set(caseStartYear, caseStartMonth, caseStartDay)
-                    Log.d("ソフト用ケースの終了日", caseendCalendar.toString())
+                    if (BuildConfig.DEBUG){
+                        Log.d("ソフト用ケースの終了日", caseendCalendar.toString())
+                    }
                     caseendCalendar.add(Calendar.MONTH, 2)
                     //カウントダウン日数を求めるメソッド呼び出し
                     val caseCountdown: Int = changeMillistoDay(caseendCalendar)
-                    Log.d("ソフト用ケースカウントダウン", caseCountdown.toString())
+                    if (BuildConfig.DEBUG){
+                        Log.d("ソフト用ケースカウントダウン", caseCountdown.toString())
+                    }
                     //カウントダウン日数を保存
                     val editorCount = prefCountDown.edit()
                     editorCount.putString("CASE_COUNT", caseCountdown.toString())
                     editorCount.apply()
                     //通知
-                    startAlarm(caseendCalendar)
-                    Log.d("ALARM_LOG","AlarmSet(case)")
+                    casestartAlarm(caseendCalendar)
+                    if (BuildConfig.DEBUG){
+                        Log.d("CASE_ALARM_LOG","AlarmSet(case)")
+                    }
                     //円グラフ作成、表示のメソッド
                     setCasePieChart(periodOfcase = 60f, daysLeftcase = caseCountdown.toFloat())
                 }
@@ -396,25 +474,33 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
         //レンズの種類を読み取って、日付の計算をする
         val lensType = prefType.getInt("LENS_TYPE", -1)
-        Log.d(ALARM_LOG,lensType.toString())
+        if (BuildConfig.DEBUG){
+            Log.d(LENS_ALARM_LOG,lensType.toString())
+        }
         when(lensType) {
             0 -> {
                 //レンズ開始日からレンズ終了日を求める
                 val lensendCalendar = Calendar.getInstance()
                 //lensStartMonth = lensStartMonth - 1
                 lensendCalendar.set(lensStartYear, lensStartMonth, lensStartDay)
+                if (BuildConfig.DEBUG){
+                    Log.d("ソフトレンズの終了日",lensendCalendar.toString())
+                }
                 lensendCalendar.add(Calendar.DATE,14)
-                Log.d("ソフトレンズの終了日",lensendCalendar.toString())
                 //カウントダウン日数を求めるメソッド呼び出し
                 val lensCountdown: Int= changeMillistoDay(lensendCalendar)
-                Log.d("ソフトレンズカウントダウン",lensCountdown.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ソフトレンズカウントダウン",lensCountdown.toString())
+                }
                 //戻り値にカウントダウン日数を返す
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("LENS_COUNT",lensCountdown.toString())
                 editorCount.apply()
                 //通知
-                startAlarm(lensendCalendar)
-                Log.d("ALARM_LOG","AlarmSet(lens)")
+                lensstartAlarm(lensendCalendar)
+                if (BuildConfig.DEBUG){
+                    Log.d("LENS_ALARM_LOG","AlarmSet(lens)")
+                }
                 //円グラフ作成、表示のメソッド
                 setLensPieChart(periodOflens = 14f, daysLeftlens = lensCountdown.toFloat())
             }
@@ -424,18 +510,24 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val lensendCalendar = Calendar.getInstance()
                 //lensStartMonth = lensStartMonth - 1
                 lensendCalendar.set(lensStartYear, lensStartMonth, lensStartDay)
-                Log.d("ハードレンズの終了日",lensendCalendar.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ハードレンズの終了日",lensendCalendar.toString())
+                }
                 lensendCalendar.add(Calendar.MONTH,1)
                 //カウントダウン日数を求めるメソッド呼び出し
                 val lensCountdown: Int= changeMillistoDay(lensendCalendar)
-                Log.d("ハードレンズカウントダウン",lensCountdown.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ハードレンズカウントダウン",lensCountdown.toString())
+                }
                 //カウントダウン日数を保存
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("LENS_COUNT",lensCountdown.toString())
                 editorCount.apply()
                 //通知
-                startAlarm(lensendCalendar)
-                Log.d("ALARM_LOG","AlarmSet(lens)")
+                lensstartAlarm(lensendCalendar)
+                if (BuildConfig.DEBUG){
+                    Log.d("LENS_ALARM_LOG","AlarmSet(lens)")
+                }
                 //円グラフ作成、表示のメソッド
                 setLensPieChart(periodOflens = 30f, daysLeftlens = lensCountdown.toFloat())
             }
@@ -445,18 +537,24 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val lensendCalendar = Calendar.getInstance()
                 //lensStartMonth = lensStartMonth - 1
                 lensendCalendar.set(lensStartYear, lensStartMonth, lensStartDay)
+                if (BuildConfig.DEBUG){
+                    Log.d("ソフトレンズの終了日",lensendCalendar.toString())
+                }
                 lensendCalendar.add(Calendar.DATE,14)
-                Log.d("ソフトレンズの終了日",lensendCalendar.toString())
                 //カウントダウン日数を求めるメソッド呼び出し
                 val lensCountdown: Int= changeMillistoDay(lensendCalendar)
-                Log.d("ソフトレンズカウントダウン",lensCountdown.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ソフトレンズカウントダウン",lensCountdown.toString())
+                }
                 //戻り値にカウントダウン日数を返す
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("LENS_COUNT",lensCountdown.toString())
                 editorCount.apply()
                 //通知
-                startAlarm(lensendCalendar)
-                Log.d("ALARM_LOG","AlarmSet(lens)")
+                lensstartAlarm(lensendCalendar)
+                if (BuildConfig.DEBUG){
+                    Log.d("LENS_ALARM_LOG","AlarmSet(lens)")
+                }
                 //円グラフ作成、表示のメソッド
                 setLensPieChart(periodOflens = 14f, daysLeftlens = lensCountdown.toFloat())
             }
@@ -465,7 +563,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
         //ケースの種類を読み取って、日付の計算をする
         val caseType = prefType.getInt("CASE_TYPE", -1)
-        Log.d(ALARM_LOG,caseType.toString())
+        if (BuildConfig.DEBUG){
+            Log.d(CASE_ALARM_LOG,caseType.toString())
+        }
 
         when(caseType) {
             0 -> {
@@ -473,18 +573,24 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val caseendCalendar = Calendar.getInstance()
                 //caseStartMonth = caseStartMonth - 1
                 caseendCalendar.set(caseStartYear, caseStartMonth, caseStartDay)
-                Log.d("ソフト用ケースの終了日",caseendCalendar.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ソフト用ケースの終了日",caseendCalendar.toString())
+                }
                 caseendCalendar.add(Calendar.MONTH,2)
                 //カウントダウン日数を求めるメソッド呼び出し
                 val caseCountdown: Int= changeMillistoDay(caseendCalendar)
-                Log.d("ソフト用ケースカウントダウン",caseCountdown.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ソフト用ケースカウントダウン",caseCountdown.toString())
+                }
                 //カウントダウン日数を保存
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("CASE_COUNT",caseCountdown.toString())
                 editorCount.apply()
                 //通知
-                startAlarm(caseendCalendar)
-                Log.d("ALARM_LOG","AlarmSet(case)")
+                casestartAlarm(caseendCalendar)
+                if (BuildConfig.DEBUG){
+                    Log.d("CASE_ALARM_LOG","AlarmSet(case)")
+                }
                 //円グラフ作成、表示のメソッド
                 setCasePieChart(periodOfcase = 60f, daysLeftcase = caseCountdown.toFloat())
             }
@@ -494,18 +600,24 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val caseendCalendar = Calendar.getInstance()
                 //caseStartMonth = caseStartMonth - 1
                 caseendCalendar.set(caseStartYear, caseStartMonth, caseStartDay)
-                Log.d("ハード用ケースの終了日",caseendCalendar.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ハード用ケースの終了日",caseendCalendar.toString())
+                }
                 caseendCalendar.add(Calendar.MONTH,6)
                 //カウントダウン日数を求めるメソッド呼び出し
                 val caseCountdown: Int= changeMillistoDay(caseendCalendar)
-                Log.d("ハード用ケースカウントダウン",caseCountdown.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ハード用ケースカウントダウン",caseCountdown.toString())
+                }
                 //カウントダウン日数を保存
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("CASE_COUNT",caseCountdown.toString())
                 editorCount.apply()
                 //通知
-                startAlarm(caseendCalendar)
-                Log.d("ALARM_LOG","AlarmSet(case)")
+                casestartAlarm(caseendCalendar)
+                if (BuildConfig.DEBUG){
+                    Log.d("CASE_ALARM_LOG","AlarmSet(case)")
+                }
                 //円グラフ作成、表示のメソッド
                 setCasePieChart(periodOfcase = 180f, daysLeftcase = caseCountdown.toFloat())
             }
@@ -515,18 +627,24 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val caseendCalendar = Calendar.getInstance()
                 //caseStartMonth = caseStartMonth - 1
                 caseendCalendar.set(caseStartYear, caseStartMonth, caseStartDay)
-                Log.d("ソフト用ケースの終了日",caseendCalendar.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ソフト用ケースの終了日",caseendCalendar.toString())
+                }
                 caseendCalendar.add(Calendar.MONTH,2)
                 //カウントダウン日数を求めるメソッド呼び出し
                 val caseCountdown: Int= changeMillistoDay(caseendCalendar)
-                Log.d("ソフト用ケースカウントダウン",caseCountdown.toString())
+                if (BuildConfig.DEBUG){
+                    Log.d("ソフト用ケースカウントダウン",caseCountdown.toString())
+                }
                 //カウントダウン日数を保存
                 val editorCount = prefCountDown.edit()
                 editorCount .putString("CASE_COUNT",caseCountdown.toString())
                 editorCount.apply()
                 //通知
-                startAlarm(caseendCalendar)
-                Log.d("ALARM_LOG","AlarmSet(case)")
+                casestartAlarm(caseendCalendar)
+                if (BuildConfig.DEBUG){
+                    Log.d("CASE_ALARM_LOG","AlarmSet(case)")
+                }
                 //円グラフ作成、表示のメソッド
                 setCasePieChart(periodOfcase = 60f, daysLeftcase = caseCountdown.toFloat())
             }

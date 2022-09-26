@@ -19,21 +19,34 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
     @RequiresApi(Build.VERSION_CODES.O)
 
     override fun onReceive(context: Context, intent: Intent?) {
-        Log.d(MainActivity.ALARM_LOG,"onReceive()")
+        if (BuildConfig.DEBUG) {
+            Log.d(MainActivity.LENS_ALARM_LOG, "onReceive()")
+        }
+        if (BuildConfig.DEBUG) {
+            Log.d(MainActivity.CASE_ALARM_LOG, "onReceive()")
+        }
 
-        val requestCode = intent?.getIntExtra(MainActivity.REQUEST_CODE_KEY,0) as Int
+        val requestLensCode = intent?.getIntExtra(MainActivity.LENS_REQUEST_CODE_KEY, 0) as Int
 
+        val requestCaseCode = intent?.getIntExtra(MainActivity.CASE_REQUEST_CODE_KEY, 0) as Int
         //通知のタップアクション(ユーザーが通知をタップしたときにMainActivityを開く)
-        val pendingIntent = PendingIntent.getActivity(
+        val pendingLensIntent = PendingIntent.getActivity(
             context,
-            requestCode,
-            Intent(context,MainActivity::class.java),
+            requestLensCode,
+            Intent(context, MainActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val pendingCaseIntent = PendingIntent.getActivity(
+            context,
+            requestCaseCode,
+            Intent(context, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
         )
 
         //1.通知コンテンツの設定
         //チャンネルIDの指定が必要
-        val builder = NotificationCompat.Builder(context,CHANNEL_ID)
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             //小さなアイコン
             .setSmallIcon(R.drawable.ic_alarm)
             // タイトル。
@@ -43,12 +56,13 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
             // 通知の優先度（Android 7.1以下）。
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             // 通知のタップアクションを設定する。
-            .setContentIntent(pendingIntent)
+            .setContentIntent(pendingLensIntent)
+            .setContentIntent(pendingCaseIntent)
             // ユーザーが通知をタップすると、配信された通知が自動的に消去される。
             .setAutoCancel(true)
 
         //チャンネルを作成して重要度を作成する
-        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 context.getString(R.string.channel_name),
@@ -75,11 +89,15 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
         //通知を表示する
         with(NotificationManagerCompat.from(context)) {
             //notificationID:一意の整数
-            notify(NOTIFICATION_ID,builder.build())
+            notify(NOTIFICATION_ID, builder.build())
         }
     }
-    companion object{
+
+    companion object {
         private const val CHANNEL_ID = "DEFAULT"
         private const val NOTIFICATION_ID = 9999
     }
 }
+
+
+
