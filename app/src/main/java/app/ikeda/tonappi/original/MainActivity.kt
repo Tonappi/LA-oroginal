@@ -13,6 +13,7 @@ import android.widget.DatePicker
 import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import app.ikeda.tonappi.original.databinding.ActivityMainBinding
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
@@ -69,6 +70,19 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         binding.lensDayleftView.text = "$lensPeriod 日"
         //ケースカウントダウンを表示
         binding.caseDaysleftView.text = "$casePeriod 日"
+        //値がないとき、PieChartを非表示にする
+        if(lensStartdate == "開始日"){
+            binding.lensPieChart.isVisible = false
+            binding.lensDayleftView.text = "××日"
+        }else{
+
+        }
+        if(caseStartdate == "開始日"){
+            binding.casePieChart.isVisible = false
+            binding.caseDaysleftView.text = "××日"
+        }else{
+
+        }
 
 
         //レンズ登録ボタンを押したとき
@@ -313,6 +327,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 }
                 //円グラフ作成、表示のメソッド
                 setLensPieChart(periodOflens = 14f, daysLeftlens = lensCountdown.toFloat())
+
             }
 
             1 -> {
@@ -339,7 +354,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     Log.d("LENS_ALARM_LOG","AlarmSet(lens)")
                 }
                 //円グラフ作成、表示のメソッド
-                setLensPieChart(periodOflens = 30f, daysLeftlens = lensCountdown.toFloat())
+                setLensPieChart(periodOflens = 31f, daysLeftlens = lensCountdown.toFloat())
             }
 
             else ->{
@@ -368,8 +383,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     if (BuildConfig.DEBUG){
                         Log.d("LENS_ALARM_LOG","AlarmSet(lens)")
                     }
+
                     //円グラフ作成、表示のメソッド
                     setLensPieChart(periodOflens = 14f, daysLeftlens = lensCountdown.toFloat())
+
                 }
 
             }
@@ -406,7 +423,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     Log.d("CASE_ALARM_LOG","AlarmSet(case)")
                 }
                 //円グラフ作成、表示のメソッド
-                setCasePieChart(periodOfcase = 60f, daysLeftcase = caseCountdown.toFloat())
+                setCasePieChart(periodOfcase = 62f, daysLeftcase = caseCountdown.toFloat())
             }
 
             1 -> {
@@ -414,26 +431,28 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 val caseendCalendar = Calendar.getInstance()
                 caseStartMonth = caseStartMonth - 1
                 caseendCalendar.set(caseStartYear, caseStartMonth, caseStartDay)
-                if (BuildConfig.DEBUG){
-                    Log.d("ハード用ケースの終了日",caseendCalendar.toString())
+                if (BuildConfig.DEBUG) {
+                    Log.d("ハード用ケースの終了日", caseendCalendar.toString())
                 }
-                caseendCalendar.add(Calendar.MONTH,6)
+                caseendCalendar.add(Calendar.MONTH, 6)
                 //カウントダウン日数を求めるメソッド呼び出し
-                val caseCountdown: Int= changeMillistoDay(caseendCalendar)
-                if (BuildConfig.DEBUG){
-                    Log.d("ハード用ケースカウントダウン",caseCountdown.toString())
+                val caseCountdown: Int = changeMillistoDay(caseendCalendar)
+                if (BuildConfig.DEBUG) {
+                    Log.d("ハード用ケースカウントダウン", caseCountdown.toString())
                 }
                 //カウントダウン日数を保存
                 val editorCount = prefCountDown.edit()
-                editorCount .putString("CASE_COUNT",caseCountdown.toString())
+                editorCount.putString("CASE_COUNT", caseCountdown.toString())
                 editorCount.apply()
                 //通知
                 casestartAlarm(caseendCalendar)
-                if (BuildConfig.DEBUG){
-                    Log.d("CASE_ALARM_LOG","AlarmSet(case)")
+                if (BuildConfig.DEBUG) {
+                    Log.d("CASE_ALARM_LOG", "AlarmSet(case)")
                 }
                 //円グラフ作成、表示のメソッド
-                setCasePieChart(periodOfcase = 180f, daysLeftcase = caseCountdown.toFloat())
+                setCasePieChart(periodOfcase = 184f, daysLeftcase = caseCountdown.toFloat())
+
+
             }
 
             else->{
@@ -463,7 +482,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                         Log.d("CASE_ALARM_LOG","AlarmSet(case)")
                     }
                     //円グラフ作成、表示のメソッド
-                    setCasePieChart(periodOfcase = 60f, daysLeftcase = caseCountdown.toFloat())
+                    setCasePieChart(periodOfcase = 62f, daysLeftcase = caseCountdown.toFloat())
                 }
             }
         }
@@ -529,7 +548,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     Log.d("LENS_ALARM_LOG","AlarmSet(lens)")
                 }
                 //円グラフ作成、表示のメソッド
-                setLensPieChart(periodOflens = 30f, daysLeftlens = lensCountdown.toFloat())
+                setLensPieChart(periodOflens = 31f, daysLeftlens = lensCountdown.toFloat())
             }
 
             else->{
@@ -592,7 +611,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     Log.d("CASE_ALARM_LOG","AlarmSet(case)")
                 }
                 //円グラフ作成、表示のメソッド
-                setCasePieChart(periodOfcase = 60f, daysLeftcase = caseCountdown.toFloat())
+                setCasePieChart(periodOfcase = 62f, daysLeftcase = caseCountdown.toFloat())
             }
 
             1 -> {
@@ -619,7 +638,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     Log.d("CASE_ALARM_LOG","AlarmSet(case)")
                 }
                 //円グラフ作成、表示のメソッド
-                setCasePieChart(periodOfcase = 180f, daysLeftcase = caseCountdown.toFloat())
+                setCasePieChart(periodOfcase = 184f, daysLeftcase = caseCountdown.toFloat())
             }
 
             else ->{
@@ -646,7 +665,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                     Log.d("CASE_ALARM_LOG","AlarmSet(case)")
                 }
                 //円グラフ作成、表示のメソッド
-                setCasePieChart(periodOfcase = 60f, daysLeftcase = caseCountdown.toFloat())
+                setCasePieChart(periodOfcase = 62f, daysLeftcase = caseCountdown.toFloat())
             }
         }
     }
