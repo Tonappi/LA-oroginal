@@ -177,6 +177,27 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 binding.lensPeriodView.text = StartDate.toString()
                 //カウントダウンを表示
                 binding.lensDayleftView.text = "$lensPeriod 日"
+                //PieChartの作製、表示
+                when(kindOfLens){
+                    //ソフトレンズのとき
+                    0->{
+                        if (lensPeriod != null) {
+                            setLensPieChart(14f,lensPeriod.toFloat())
+                        }
+                    }
+                    //ハードレンズのとき
+                    1->{
+                        if (lensPeriod != null) {
+                            setLensPieChart(31f,lensPeriod.toFloat())
+                        }
+                    }
+                    //登録できてなかったときのデフォルトでソフトレンズのとき
+                    else->{
+                        if (lensPeriod != null) {
+                            setLensPieChart(14f,lensPeriod.toFloat())
+                        }
+                    }
+                }
                 //レンズ開始日をString型で保存
                 val editorStr = prefStrDate.edit()
                 editorStr.putString("LENS_yyyy/mm/dd", StartDate)
@@ -194,6 +215,33 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
                 binding.casePeriodView.text = StartDate.toString()
                 //カウントダウンを表示
                 binding.caseDaysleftView.text = "$casePeriod 日"
+                //PieChartの作製、表示
+                when(kindOfLens){
+                    //ソフト用ケースのとき
+                    0->{
+
+                        if (casePeriod != null) {
+                            setLensPieChart(62f, casePeriod.toFloat())
+                        }
+
+                    }
+                    //ハードレンズのとき
+                    1->{
+
+                        if (casePeriod != null) {
+                            setLensPieChart(184f, casePeriod.toFloat())
+                        }
+
+                    }
+                    //登録できてなかったときのデフォルトでソフトレンズのとき
+                    else->{
+
+                        if (casePeriod != null) {
+                            setLensPieChart(62f, casePeriod.toFloat())
+                        }
+
+                    }
+                }
                 //ケース開始日をString型で保存
                 val editorStr = prefStrDate.edit()
                 editorStr.putString("CASE_yyyy/mm/dd", StartDate)
@@ -700,6 +748,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         pieChart.description.isEnabled = false
         //PieChart更新
         pieChart.invalidate()
+        if(BuildConfig.DEBUG){
+            Log.d("LENS_CHART",values.toString())
+        }
     }
 
     //ケースの円グラフを表示するメソッド
@@ -733,6 +784,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         pieChart.description.isEnabled = false
         //PieChart更新
         pieChart.invalidate()
+        if(BuildConfig.DEBUG){
+            Log.d("CASE_CHART",values.toString())
+        }
     }
 }
 
