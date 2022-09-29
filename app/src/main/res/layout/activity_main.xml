@@ -6,102 +6,118 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/lens_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
-        android:text="レンズ交換まであと"
-        app:layout_constraintBottom_toTopOf="@+id/lens_dayleft_view"
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/lens_pieChart"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/lens_period_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lens_text_view">
+
+    </com.github.mikephil.charting.charts.PieChart>
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/case_pieChart"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/case_period_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/case_text_view">
+
+    </com.github.mikephil.charting.charts.PieChart>
 
     <TextView
         android:id="@+id/lens_dayleft_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="56dp"
         android:text="0"
+        android:textColor="@color/black"
         android:textSize="40sp"
-        app:layout_constraintBottom_toTopOf="@+id/lens_period_view"
+        app:layout_constraintBottom_toTopOf="@id/lens_period_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/pieChart"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
     <TextView
         android:id="@+id/lens_period_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:text="開始日を登録してください"
+        android:text="yyyy/mm/dd"
+        android:textColor="@color/black"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/lens_add_button"
+        app:layout_constraintBottom_toTopOf="@id/lens_add_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="TouchTargetSizeCheck" />
 
-    <Button
-        android:id="@+id/lens_add_button"
+    <TextView
+        android:id="@+id/lens_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="96dp"
-        android:text="レンズ登録"
-        app:layout_constraintBottom_toTopOf="@+id/case_text_view"
-        app:layout_constraintEnd_toStartOf="@id/lens_day_button"
+        android:layout_marginBottom="64dp"
+        android:text="レンズ交換まで"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@id/lens_dayleft_view"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/lens_day_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="96dp"
-        android:text="開始日登録"
-        app:layout_constraintBottom_toTopOf="@id/case_text_view"
-        app:layout_constraintStart_toEndOf="@id/lens_add_button"
-        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/case_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
-        android:text="ケース交換まであと"
-        app:layout_constraintBottom_toTopOf="@+id/case_daysleft_view"
+        android:layout_marginBottom="64dp"
+        android:text="ケース交換まで"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@id/case_daysleft_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/lens_add_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:layout_marginBottom="280dp"
+        android:backgroundTint="@color/teal_200"
+        android:text="レンズ登録"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/case_add_button" />
+
+    <Button
+        android:id="@+id/lens_day_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="56dp"
+        android:layout_marginBottom="280dp"
+        android:backgroundTint="@color/teal_200"
+        android:text="開始日登録"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/case_day_button" />
 
     <TextView
         android:id="@+id/case_daysleft_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="56dp"
         android:text="0"
+        android:textColor="@color/black"
         android:textSize="40sp"
-        app:layout_constraintBottom_toTopOf="@+id/case_period_view"
+        app:layout_constraintBottom_toTopOf="@id/case_period_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/casepieChart"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
     <TextView
         android:id="@+id/case_period_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="88dp"
         android:text="yyyy/mm/dd"
+        android:textColor="@color/black"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/case_add_button"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="TouchTargetSizeCheck" />
@@ -110,23 +126,22 @@
         android:id="@+id/case_add_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginEnd="40dp"
+        android:layout_marginStart="56dp"
         android:layout_marginBottom="40dp"
+        android:backgroundTint="@color/teal_200"
         android:text="ケース登録"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/case_day_button"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/case_day_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginEnd="48dp"
+        android:layout_marginEnd="56dp"
         android:layout_marginBottom="40dp"
+        android:backgroundTint="@color/teal_200"
         android:text="開始日登録"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/case_add_button" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
