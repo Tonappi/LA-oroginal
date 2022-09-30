@@ -1,26 +1,34 @@
 package app.ikeda.tonappi.original
 
+
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.Paint
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import app.ikeda.tonappi.original.databinding.ActivityMainBinding
+import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.*
+
 
 //DataPickerDialog.OnDateSetListenerを追加
 class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
@@ -70,20 +78,9 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         binding.lensDayleftView.text = "$lensPeriod 日"
         //ケースカウントダウンを表示
         binding.caseDaysleftView.text = "$casePeriod 日"
-        //値がないとき、PieChartを非表示にする
-        if(lensStartdate == "開始日"){
-            binding.lensPieChart.isVisible = false
-            binding.lensDayleftView.text = "××日"
-        }else{
-
-        }
-        if(caseStartdate == "開始日"){
-            binding.casePieChart.isVisible = false
-            binding.caseDaysleftView.text = "××日"
-        }else{
-
-        }
-
+        //PieChartデータないときの文言非表示
+        binding.lensPieChart.setNoDataText(" ")
+        binding.casePieChart.setNoDataText(" ")
 
         //レンズ登録ボタンを押したとき
         binding.lensAddButton.setOnClickListener {
@@ -150,10 +147,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     companion object {
         const val LENS_REQUEST_CODE_KEY = "LENS_REQUEST_CODE"
-        //const val LENS_REQUEST_CODE = 1
         const val LENS_ALARM_LOG = "LENS_ALARM_LOG"
-        //const val CASE_REQUEST_CODE_KEY = "CASE_REQUEST_CODE"
-        //const val CASE_REQUEST_CODE = 1
         const val CASE_ALARM_LOG = "CASE_ALARM_LOG"
     }
 
@@ -719,6 +713,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
     }
 
     //レンズの円グラフを表示するメソッド
+    @SuppressLint("ResourceAsColor")
     fun setLensPieChart(periodOflens: Float, daysLeftlens: Float) {
         //表示用サンプルデータの作成
         val dimensions = listOf<String>("", "")
@@ -778,6 +773,10 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         //PieChartにPieData格納
         var pieChart = this.findViewById<PieChart>(R.id.case_pieChart)
         pieChart.data = pieData
+        //データなしのとき
+        pieChart.setNoDataText("No Data Available");
+        val paint:Paint =  pieChart.getPaint(Chart.PAINT_INFO)
+        paint.textSize = 40f
         //Chartのフォーマット指定
         pieChart.legend.isEnabled = false
         pieChart.holeRadius = 80f
@@ -789,6 +788,7 @@ class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
         }
     }
 }
+
 
 
 
